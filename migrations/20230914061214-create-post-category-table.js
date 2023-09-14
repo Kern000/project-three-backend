@@ -14,6 +14,7 @@ exports.setup = function(options, seedLink) {
   seed = seedLink;
 };
 
+
 exports.up = async function(db) {
   await db.createTable('post_categories',{
     "id":       {

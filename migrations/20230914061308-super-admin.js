@@ -44,7 +44,7 @@ exports.up = async function(db) {
 };
 
 exports.down = function(db) {
-  return dropTable('super_admin')
+  return db.dropTable('super_admin')
 };
 
 exports._meta = {
