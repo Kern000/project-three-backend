@@ -26,19 +26,6 @@ exports.up = function(db) {
       defaultValue:"false",
       length:10
     },
-    product_id:{
-      type:"int",
-      notNull: true,
-      foreignKey:{
-        name:"order_items_product_fk",
-        table: "products",
-        mapping: "id",
-        rules: {
-          onDelete: "cascade",
-          onUpdate: "restrict"
-        }
-      }
-    },
     cart_id:{
       type:"int",
       notNull: true,
@@ -56,7 +43,6 @@ exports.up = function(db) {
 };
 
 exports.down = async function(db) {
-  await db.removeForeignKey('order_items', 'order_items_product_fk');
   await db.removeForeignKey('order_items', 'order_items_cart_fk');
   return db.dropTable('order_items');
 };
