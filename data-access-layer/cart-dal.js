@@ -1,5 +1,24 @@
 const { Cart_Item } = require('../models');
 
+const retrieveAllCarts = async () => {
+    try{
+        const allCarts = await Cart_Item.collection().fetch({
+            'require': false,
+            'withRelated': ['product', 
+                            'product.post_category', 
+                            'product.genres', 
+                            {
+                            'product.user': (queryBuild) => {
+                                queryBuild.select('id', 'name')
+                            }
+            }]
+        })
+        return allCarts;
+    } catch (error) {
+        console.error('failed to retrieve all carts', error);
+    }
+}
+
 const retrieveUserCartItems = async (userId) => {
 
     try{
@@ -9,17 +28,25 @@ const retrieveUserCartItems = async (userId) => {
                             'require': false,
                             'withRelated': ['product', 
                                             'product.post_category', 
-                                            'product.genres', 
+                                            'product.genres',
                                             {
                                             'product.user': (queryBuild) => {
                                                 queryBuild.select('id', 'name')
                                             }
                             }]
                         })
-
         return userCartItems;
     } catch (error){
         console.error('error retrieving cart items', error)
+    }
+}
+
+const deleteCart = async (userId) => {
+    try{
+        const userCart = await retrieveUserCartItems(userId);
+        await userCart.destroy();
+    } catch (error) {
+        console.error('fail to delete user cart', error)
     }
 }
 
@@ -77,7 +104,9 @@ const removeEntryFromCart = async (userId, posterId) => {
 }
 
 module.exports = {
-                    retrieveUserCartItems, 
+                    retrieveAllCarts,
+                    retrieveUserCartItems,
+                    deleteCart,
                     createNewCartItem, 
                     fetchCartItemByUserAndProduct, 
                     updateCartItemQuantity, 
