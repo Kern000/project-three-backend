@@ -89,6 +89,27 @@ const Order_Item = bookshelf.model('Order_Item',{
     }
 })
 
+const Super_Admin = bookshelf.model('Super_Admin', {
+    tableName: 'super_admin',
+
+    sessions(){
+        return this.hasMany('Session')
+    }
+})
+
+const BlackListedToken = bookshelf.model("BlackListedToken", {
+    tableName: 'blacklisted_tokens'
+})
+
+const Session = bookshelf.model("Session",{
+    tableName: 'sessions',
+
+    Super_Admin(){
+        return this.belongsTo('Super_Admin')
+    }
+})
+
+
 
 module.exports = {  
                     Product, 
@@ -96,5 +117,8 @@ module.exports = {
                     Genre, 
                     User, 
                     Cart_Item, 
-                    Order_Item 
+                    Order_Item,
+                    Super_Admin,
+                    BlackListedToken,
+                    Session
                 }
