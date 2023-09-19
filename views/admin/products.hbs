@@ -1,0 +1,117 @@
+{{#extends 'base'}}
+{{#block 'nav'}}
+<nav class="navbar navbar-expand-md navbar-light bg-light">
+        <div class="container-fluid">
+            <ul class="navbar-nav">
+                <li class="nav-item ms-2 mr-2">
+                    <a class="nav-link" href="/admin/products">Home</a>
+                </li>
+                <li class="nav-item ms-2 mr-2">
+                    <a class="nav-link" href="/admin/users">Manage Users</a>
+                </li>
+                <li class="nav-item ms-2 mr-2">
+                    <a class="nav-link" href="/admin/add-product">List new product</a>
+                </li>
+                </li>
+                    <li class="nav-item ms-2 mr-2">
+                    <a class="nav-link" href="/admin/orders">Manage Orders</a>
+                </li>                    
+            </ul>
+            <div>
+                <span   class="me-2"
+                        style="font-family: Montserrat, sans-serif; font-size:13px;"> Welcome back, Admin </span>
+                <a href="/admin/logout" class="ml-3 me-4 btn btn-dark btn-sm">Logout</a>
+            </div>
+        </div>
+    </nav>
+{{/block}}
+{{#block "content"}}
+
+<div class="d-flex align-items-center">
+    <button id="search-toggle" class="btn btn-light btn-sm ms-2 mt-2 me-2" style="border: 1px solid silver;"> = </button>
+    <h4 class="ms-2 mt-2 mb-0">Products</h4>
+</div>
+
+<div class="container-fluid mt-3 ms-0">
+    <div class="row">
+        <div id="search-form" class="col-md-2">
+            <form method="GET" style="max-width:230px">
+                <h6> Search </h6>
+                <div style="font-family: Montserrat, sans-serif; font-size:13px; margin-top: 10px;">
+                    {{{adminForm}}}
+                </div>
+                <input type="submit" class="mb-2 mt-3 btn btn-dark btn-sm"/>
+            </form>
+        </div>
+        <div id="listing-table" class="col-md-10">
+            <table class="table">
+                <thead>
+                    <tr style="text-align: center">
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Description</th>
+                        <th>Date Created</th>
+                        <th>Stock</th>
+                        <th>Sold</th>
+                        <th>Post Category</th>  
+                        <th>Genres</th>
+                        <th>Image</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each products}}
+                    <tr style="text-align: center">
+                        <td>{{this.id}}</td>
+                        <td>{{this.name}}</td>
+                        <td>{{this.price}}</td>
+                        <td>{{this.description}}</td>
+                        <td>{{this.date_created}}</td>
+                        <td>{{this.stock}}</td>
+                        <td>{{this.quantity_sold}}</td>
+                        <td>
+                            <span class="badge bg-secondary">{{this.post_category.category}} </span>
+                        </td>
+                        <td>
+                            {{#each this.genres}}
+                                <span class="badge bg-secondary">{{this.genre}}</span>
+                            {{/each}}
+                        </td>
+                        <td>
+                            {{#if this.thumbnail_url}}
+                                <img src="{{this.thumbnail_url}}" class="img-fluid" alt="image">
+                            {{/if}}
+                        </td>
+                        <td>
+                            <a href="/admin/products/{{this.id}}/update" class="btn btn-light btn-sm">Update</a>
+                        </td>
+                        <td>
+                            <a href="/admin/products/{{this.id}}/delete" class="btn btn-dark btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{{/block}}
+{{#block 'js'}}
+    <script>
+        let searchToggle = document.querySelector('#search-toggle');
+        let searchForm = document.querySelector('#search-form');
+        let listingTable = document.querySelector('#listing-table');
+
+        searchToggle.addEventListener('click', ()=>{
+            searchForm.style.display = searchForm.style.display === 'none'? 'inline' : 'none';
+            if (listingTable.classList === 'col-md-10'){
+                listingTable.classList.toggle('col-md-12')
+            } else {
+                listingTable.classList.toggle('col-md-10')
+            }
+        })
+    </script>
+{{/block}}
+{{/extends}}

@@ -3,6 +3,8 @@ const csurf = require('csurf');
 const csrfInstance = csurf();
 
 const checkSessionAuthentication = (req, res, next) => {
+
+    console.log('check session authentication hit')
     if (req.session.user){
         next();
     } else {
@@ -19,6 +21,7 @@ const checkSessionPreference = (req, res, next) => {
 }
 
 const checkAuthenticationWithJWT = (req, res, next) => {
+    console.log('check Authentication with JWT hit')
     const authHeader = req.headers.authorization;
     if(authHeader){
         const token = authHeader.split(" ")[1];
@@ -43,11 +46,14 @@ const createCSRFWithExceptions = (req, res, next) => {
     if (req.url === "/checkout/process-payment") {
         return next();
     }
-    csrfInstance(req.res.next);
+    console.log('csrf with exception hit')
+    csrfInstance(req, res, next);
 }
 
 // have to come after session, csrf
 const sessionExpiryRouting = (req, res, next) => {
+    console.log('session expiry routing hit');
+
     if(error && error.code == "EBADCSRFTOKEN"){
         res.send("Session expired, login again");
         // frontend will have rerout logic

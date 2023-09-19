@@ -1,0 +1,52 @@
+{{#extends 'base'}}
+
+{{#block "content"}}
+<h1>All Orders</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cart id</th>
+            <th>User id</th>
+            <th>Quantity</th>
+            <th>Product id</th>
+            <th>Product Name</th>
+            <th>thumbnail url</th>
+            <th>Chapter Content</th>
+            <th>Post Category</th>  
+            <th>Genres</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each orders}}
+        <tr>
+            <td>{{this.id}}</td>
+            <td>{{this.cart_id}}</td>
+            <td>{{this.user_id}}</td>
+            <td>{{this.quantity}}</td>
+            <td>{{this.product_id}}</td>
+            <td>{{this.product.name}}</td>
+            <td>{{this.product.thumbnail_url}}</td>
+            <td>{{this.product.chapter_content}}</td>
+            <td>{{this.product.post_category.name}}</td>
+            <td>
+                {{#each this.product.genres}}
+                    <span class="badge bg-secondary">{{this.product.genres.name}}</span>
+                {{/each}}
+            </td>
+            <td>
+                {{#if this.product.thumbnail_url}}
+                    <img src="{{this.product.thumbnail_url}}" class="img-fluid" alt="image">
+                {{/if}}
+            </td>
+            <td>
+                <a href="/admin/orders/{{this.user.id}}/delete" class="btn btn-danger btn-sm">Delete</a>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+{{/block}}
+{{/extends}}

@@ -20,10 +20,10 @@ const retrieveAllOrders = async () => {
     }
 }
 
-const retrieveOrderByUserId = async (userId) => {
+const retrieveOrderByOrderId = async (orderId) => {
     try{
         const userOrder = await Order_Item.collection()
-                        .where({'user_id': userId})
+                        .where({'id': orderId})
                         .fetch({
                             'require': false,
                             'withRelated': ['cart_item',
@@ -42,9 +42,9 @@ const retrieveOrderByUserId = async (userId) => {
     }
 }
 
-const deleteOrder = async (userId) => {
+const deleteOrder = async (orderId) => {
     try{
-        const userOrder = await retrieveOrderByUserId(userId);
+        const userOrder = await retrieveOrderByOrderId(orderId);
         await userOrder.destroy();
     } catch (error){
         console.error('failed to delete order', error);
@@ -106,7 +106,7 @@ const removeOrderItem = async (userId, posterId) => {
 
 module.exports =    {
                         retrieveAllOrders,
-                        retrieveOrderByUserId,
+                        retrieveOrderByOrderId,
                         deleteOrder,
                         retrieveOrderItemByUserAndProduct,
                         createNewOrderItem,

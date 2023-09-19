@@ -24,6 +24,7 @@ exports.up = function(db) {
     },
     'session': {
       type: 'string',
+      length: 2000,
       notNull: true
     },
     'super_admin_id':{

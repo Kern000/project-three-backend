@@ -1,6 +1,8 @@
 const { Product, Post_Category, Genre } = require('../models');
 
 const retrieveAllProducts = async () => {
+    console.log('retrieve all products hit')
+    
     try{
         return await Product.fetchAll({
             withRelated: [  'post_category', 
@@ -62,6 +64,28 @@ const findProductById = async (productId) => {
     }
 }
 
+const addProductListing = async (productForm) => {
+
+    try{
+        const product = new Product();
+        product.set('name', productForm.data.name);
+        product.set('price', productForm.data.price);
+        product.set('description', productForm.data.description);
+        product.set('image_url', productForm.data.image_url);
+        product.set('thumbnail_url', productForm.data.thumbnail_url);
+        product.set('date_created', new Date());
+        product.set('stock', productForm.data.stock);
+        product.set('post_category_id', productForm.data.post_category_id)
+        product.set('chapter_content', productForm.data.chapter_content)
+
+        await product.save();
+        return product;
+    
+    } catch (error) {
+        console.error('error adding product listing', error)
+    }
+}
+
 const findProductsByUser = async (userName) => {
     
     try{
@@ -85,27 +109,6 @@ const findProductsByUser = async (userName) => {
     }
 }
 
-const addProductListing = async (productForm) => {
-
-    try{
-        const product = new Product();
-        product.set('name', productForm.data.name);
-        product.set('price', productForm.data.price);
-        product.set('description', productForm.data.description);
-        product.set('image_url', productForm.data.image_url);
-        product.set('thumbnail_url', productForm.data.thumbnail_url);
-        product.set('date_created', Date.now())
-        product.set('stock', productForm.data.stock);
-        product.set('chapter_content', productForm.data.chapter_content)
-        product.set('quantity_sold', productForm.data.quantity_sold)
-
-        await product.save();
-        return product;
-    
-    } catch (error) {
-        console.error('error adding product listing', error)
-    }
-}
 
 module.exports= {
                     retrieveAllProducts,

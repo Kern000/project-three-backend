@@ -3,9 +3,6 @@ const router = express.Router();
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
-const { checkAuthenticationWithJWT,
-        checkSessionAuthentication
-        } = require('../middleware')
 
 const generateJWT = (user, tokenSecret, expirationTime) => {
     return jwt.sign({
@@ -49,7 +46,7 @@ router.post('/login', async(req, res)=>{
     }
 })
 
-router.get('/logout', [checkSessionAuthentication], (req,res)=>{
+router.get('/logout', (req,res)=>{
     req.session.user = null;
     res.json({"success":"successfully logged out"})
 })

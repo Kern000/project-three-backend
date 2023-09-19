@@ -23,6 +23,52 @@ var bootstrapField = function (name, object) {
     return '<div class="form-group">' + label + widget + error + '</div>';
 };
 
+const createRegisterForm = () => {
+    return forms.create({
+        'name': fields.string({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[
+                validators.minlength(0),
+                validators.required(),
+                validators.regexp(/^[a-zA-Z0-9._%+ -!@*()^#]+$/)
+            ]
+        }),
+        'email': fields.string({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[validators.email()]
+        }),
+        'password': fields.password({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[
+                validators.minlength(0),
+                validators.required(),
+                validators.regexp(/^[a-zA-Z0-9._%+ -!@*()^#]+$/)
+            ]
+        }),
+        'passwordConfirmation': fields.password({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators: [validators.matchField('password')]
+        })
+    })
+};
+
+
 const createLoginForm = () => {
     return forms.create({
         'email': fields.string({
@@ -64,7 +110,7 @@ const createProductForm = (post_category=[], genres=[]) => {
             validators:[
                 validators.minlength(0),
                 validators.required(),
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
             ]
         }),
         'price': fields.number({
@@ -81,7 +127,7 @@ const createProductForm = (post_category=[], genres=[]) => {
             cssClasses: {
                 label: ['form-label']
             },
-            validators:[validators.regexp(/^[a-zA-Z0-9._%+ -!@]+$/)]
+            validators:[validators.regexp(/^[a-zA-Z0-9._%+ -()!@]+$/)]
         }),
         'stock': fields.number({
             required: true,
@@ -106,9 +152,12 @@ const createProductForm = (post_category=[], genres=[]) => {
             required: false,
             errorAfterField: true,
             widget: widgets.multipleSelect(),
-            choices: genres
+            choices: genres,
+            cssClasses: {
+                label: ['form-label']
+            }
         }),
-        'chapter_content': fields.strings({
+        'chapter_content': fields.string({
             required: false,
             widget: widgets.textarea({
                 rows:20,
@@ -119,60 +168,19 @@ const createProductForm = (post_category=[], genres=[]) => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@]+$/),
+                validators.regexp(/^[a-zA-Z0-9._%+ -()!@\s]+$/),
                 validators.maxlength(100000)
             ]
         }),
         'image_url': fields.string({
-            widget: widgets.hidden(),
-            validators:[validators.regexp(/^[a-zA-Z0-9._%+ -!@]+$/)]
+            widget: widgets.hidden()
         }),
         'thumbnail_url': fields.string({
-            widget: widgets.hidden(),
-            validators:[validators.regexp(/^[a-zA-Z0-9._%+ -!@]+$/)]
+            widget: widgets.hidden()
         })
     })
 };
 
-const createRegisterForm = () => {
-    return forms.create({
-        'name': fields.string({
-            required: true,
-            errorAfterField: true,
-            cssClasses: {
-                label: ['form-label']
-            }
-        }),
-        'email': fields.string({
-            required: true,
-            errorAfterField: true,
-            cssClasses: {
-                label: ['form-label']
-            },
-            validators:[validators.email()]
-        }),
-        'password': fields.password({
-            required: true,
-            errorAfterField: true,
-            cssClasses: {
-                label: ['form-label']
-            },
-            validators:[
-                validators.minlength(0),
-                validators.required(),
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@*()^#]+$/)
-            ]
-        }),
-        'passwordConfirmation': fields.password({
-            required: true,
-            errorAfterField: true,
-            cssClasses: {
-                label: ['form-label']
-            },
-            validators: [validators.matchField('password')]
-        })
-    })
-};
 
 const createSearchForm = (post_category=[], genres=[]) => {
     return forms.create({
@@ -184,7 +192,7 @@ const createSearchForm = (post_category=[], genres=[]) => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
             ]
         }),
         'user': fields.string({
@@ -228,8 +236,11 @@ const createSearchForm = (post_category=[], genres=[]) => {
             label: 'Genres',
             required: false,
             errorAfterField: true,
-            widget: widgets.multipleSelect(),
-            choices: genres
+            widget: widgets.select(),
+            choices: genres,
+            cssClasses: {
+                label: ['form-label']
+            }
         })
     })
 };

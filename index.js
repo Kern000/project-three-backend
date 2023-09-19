@@ -8,7 +8,7 @@ const wax = require("wax-on");
 const flash = require('connect-flash');
 
 const session = require('express-session');
-const FileStore = require('session-file-store'); //store session on server
+const FileStore = require('session-file-store')(session); //store session on server
 
 // Import non-global middlewares
 const {
@@ -17,7 +17,7 @@ const {
         checkSessionPreference,
         createCSRFWithExceptions,
         sessionExpiryRouting
-} = require('../middleware');
+} = require('./middleware');
 
 // Initialize Express
 let app = express();
@@ -46,6 +46,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true
 }));
+
 
 // flash message for handlebar pages
 app.use(flash());
@@ -78,6 +79,27 @@ app.use(function(req, res, next){
 // Import routes and logics, define higher level route category
 
 //
+const landingRoutes = require('./routes/landing');
+const productRoutes = require('./routes/products');
+const userRoutes = require('./routes/users');
+const superAdminRoutes = require('./routes/super-admin');
+const cloudinaryRoutes = require('./routes/cloudinary');
+const checkoutRoutes = require('./routes/checkout');
+const cartRoutes = require('./routes/cart');
+
+async function main(){
+    app.use('/admin', superAdminRoutes);
+
+
+    app.use('/', landingRoutes);
+    app.use('/products', productRoutes);
+    app.use('/user', userRoutes);
+    app.use('/cloudinary', cloudinaryRoutes);
+    app.use('/cart', cartRoutes);
+    app.use('/checkout', checkoutRoutes);
+}
+
+main();
 
 const port = process.env.PORT || 3000;
 
