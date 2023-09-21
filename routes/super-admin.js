@@ -6,19 +6,32 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
 // ORM relations
-const { Super_Admin, Product, BlackListedToken, Session } = require('../models');
+const { Super_Admin, Product, User, BlackListedToken, Session } = require('../models');
 
 // Forms
-const { bootstrapField, createLoginForm, createProductForm, createSearchForm, createRegisterForm } = require('../forms'); 
+const { bootstrapField, 
+        createLoginForm, 
+        createProductForm, 
+        createSearchForm, 
+        createRegisterForm, 
+        createUserSearchForm, 
+        createUserProductsSearchForm } = require('../forms'); 
 
-// DAL logics
+// DAL logics with spare DAL methods for usage when not using DB query
 const { retrieveAllProducts,
         retrieveAllPostCategories,
         retrieveAllGenres,
         findProductById,
+        findProductsByUserId,
         addProductListing } = require("../data-access-layer/products-dal");
-const { retrieveAllUsers } = require("../data-access-layer/super-admin-dal");
+const { retrieveAllUsers, findUserById } = require("../data-access-layer/super-admin-dal");
 const { retrieveAllOrders, retrieveOrderByOrderId } = require("../data-access-layer/order-dal");
+
+// Authentication
+const {
+    checkSessionAuthentication,
+    checkAuthenticationWithJWT,
+} = require('../middleware');
 
 router.get("/register", (req, res)=>{
     const form = createRegisterForm();
@@ -101,10 +114,12 @@ router.post('/login', async(req, res)=>{
 
             if (foundSuperAdmin){
 
-                const accessToken = generateJWT(foundSuperAdmin.toJSON(), process.env.ACCESS_TOKEN_SECRET, "1hr");
-                const refreshToken = generateJWT(foundSuperAdmin.toJSON(), process.env.REFRESH_TOKEN_SECRET, "14d");
+                const accessToken = generateJWT(foundSuperAdmin.toJSON(), process.env.ACCESS_TOKEN_SECRET, "10s");
+                const refreshToken = generateJWT(foundSuperAdmin.toJSON(), process.env.REFRESH_TOKEN_SECRET, "4h");
 
-                req.session.superUser = {
+                console.log('found super admin in db')
+
+                req.session.superAdmin = {
                     id: foundSuperAdmin.get('id'),
                     name: foundSuperAdmin.get('name'),
                     email: foundSuperAdmin.get('email'),
@@ -113,17 +128,24 @@ router.post('/login', async(req, res)=>{
                     accessToken: accessToken,
                     refreshToken: refreshToken
                 }
+                
+                req.headers.authorization = req.session.superAdmin.accessToken;
 
-                console.log(req.session.superUser)
+                console.log("This is req.session.superAdmin", req.session.superAdmin)              
+                console.log("this is req.headers.authorization", req.headers.authorization)
 
                 const superAdminId = foundSuperAdmin.get('id');
+                console.log("this is superAdminId", superAdminId)
 
                 try{
+                    console.log('trying to create session')
 
                     const session = new Session();
-                    session.set('session', req.session.superUser);
+                    session.set('session', req.session.superAdmin);
                     session.set('super_admin_id', superAdminId)
                     await session.save()
+
+                    console.log('session saved to db')
 
                     res.redirect('/admin/products')
     
@@ -139,7 +161,7 @@ router.post('/login', async(req, res)=>{
     })
 })
 
-router.get('/products', async(req,res)=>{
+router.get('/products', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
 
     let allPostCategories = await retrieveAllPostCategories();
     allPostCategories.unshift([0, '-------']);
@@ -218,7 +240,7 @@ router.get('/products', async(req,res)=>{
 
 })
 
-router.get('/products/:productId/update', async(req,res)=>{
+router.get('/products/:productId/update', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
     const productId = req.params.productId;
     const product = await findProductById(productId)
 
@@ -248,7 +270,7 @@ router.get('/products/:productId/update', async(req,res)=>{
     })
 })
 
-router.post('/products/:productId/update', async(req,res)=>{
+router.post('/products/:productId/update', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
     const productId = req.params.productId;
     const product = await findProductById(productId);
 
@@ -291,7 +313,7 @@ router.post('/products/:productId/update', async(req,res)=>{
     })
 })
 
-router.get('/add-product', async (req,res)=>{
+router.get('/add-product', [checkSessionAuthentication, checkAuthenticationWithJWT], async (req,res)=>{
     const allPostCategories = await retrieveAllPostCategories();
     const allGenres = await retrieveAllGenres();
 
@@ -304,7 +326,7 @@ router.get('/add-product', async (req,res)=>{
     })
 })
 
-router.post('/add-product', async (req, res)=>{
+router.post('/add-product', [checkSessionAuthentication, checkAuthenticationWithJWT], async (req, res)=>{
     const allPostCategories = await retrieveAllPostCategories();
     const allGenres = await retrieveAllGenres();
 
@@ -340,7 +362,7 @@ router.post('/add-product', async (req, res)=>{
     })
 })
 
-router.get('/products/:productId/delete', async (req,res)=>{
+router.get('/products/:productId/delete', [checkSessionAuthentication, checkAuthenticationWithJWT], async (req,res)=>{
     let productId = req.params.productId;
     
     const product = await findProductById(productId);
@@ -350,7 +372,7 @@ router.get('/products/:productId/delete', async (req,res)=>{
     })
 })
 
-router.post('/products/:productId/delete', async (req,res)=>{
+router.post('/products/:productId/delete', [checkSessionAuthentication, checkAuthenticationWithJWT], async (req,res)=>{
     let productId = req.params.productId;
     const product =await findProductById(productId);
 
@@ -358,85 +380,198 @@ router.post('/products/:productId/delete', async (req,res)=>{
     res.redirect('/admin/products');
 })
 
-router.get('/logout', (req,res)=>{
+router.get('/logout', [checkSessionAuthentication, checkAuthenticationWithJWT], (req,res)=>{
     req.session.user = null;
+    req.session.superAdmin = null;
+    req.headers.authorization = null;
     req.flash('success', 'Log out successful! See you soon')
     res.redirect('/admin/login')
 })
 
-router.get('/users', async(req,res)=>{
-    let users = await retrieveAllUsers();
+router.get('/users', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
 
-    res.render('admin/users',{
-        'users': users.toJSON()
+    const userSearchForm = createUserSearchForm();
+
+    const query= User.collection();
+
+    userSearchForm.handle(req, {
+        'success': async (userSearchForm) => {
+            console.log('user search route hit')
+
+            if (userSearchForm.data.id) {
+                console.log('search form id hit', userSearchForm.data.id)
+                query.where('id', '=', userSearchForm.data.id)
+            }
+
+            if (userSearchForm.data.name) {
+                console.log('search form name hit', userSearchForm.data.name)
+                query.where('name', 'like', '%' + userSearchForm.data.name + '%')
+            }
+
+            if (userSearchForm.data.email) {
+                console.log('search form email hit', userSearchForm.data.email)
+                query.where('email', '=', userSearchForm.data.email)
+            }
+
+            const users = await query.fetch()
+
+            res.render('admin/users', {
+                'users': users.toJSON(),
+                'searchForm': userSearchForm.toHTML(bootstrapField)
+            })
+        },
+        'empty': async (userSearchForm) => {
+
+            const users = await query.fetch()
+            console.log(users)
+
+            res.render('admin/users',{
+                'users': users.toJSON(),
+                'searchForm': userSearchForm.toHTML(bootstrapField)
+            })
+        }
     })
 })
 
-router.post('/:userId/delete', async (req,res)=>{
+router.get('/users/:userId/delete', [checkSessionAuthentication, checkAuthenticationWithJWT], async (req,res)=>{
     let userId = req.params.userId;
+    
+    const user = await findUserById(userId);
+
+    res.render('admin/user-delete', {
+        'user': user.toJSON()
+    })
+})
+
+router.post('/users/:userId/delete', [checkSessionAuthentication, checkAuthenticationWithJWT], async (req,res)=>{
+
+    console.log('user delete route hit');
+
+    let userId = req.params.userId;
+    console.log('req.params.userId here', userId)
     const user =await findUserById(userId);
 
     await user.destroy();
+    req.flash('success', `User Deleted`)
     res.redirect('/admin/users');
 })
 
+router.get('/users/:userId/products',  [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
+    
+    console.log('user products route hit');
 
+    let allPostCategories = await retrieveAllPostCategories();
+    allPostCategories.unshift([0, '-------']);
 
-router.post('/refreshAccess', (req,res)=>{
+    let allGenres = await retrieveAllGenres();
+    allGenres.unshift([0, '-------']);
 
-    const refreshToken = req.body.refresh;
+    const searchForm = createUserProductsSearchForm(allPostCategories, allGenres);
 
-    if(!refreshToken){
-        return res.sendStatus(400)
-    } else {
+    const query= Product.collection();
 
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async(error, payload)=>{
-            if (error){
-                return res.sendStatus(400);
+    searchForm.handle(req, {
+        'success': async (searchForm) => {
+            console.log('search route hit')
+
+            query.where('products.user_id', '=', req.params.userId);
+            
+            if (searchForm.data.name) {
+                console.log('search form name hit', searchForm.data.name)
+                query.where('name', 'like', '%' + searchForm.data.name + '%')
             }
-            try{
-                const blackListedToken = await BlackListedToken.where({
-                    "token": refreshToken
-                }).fetch({
-                    require:false
-                })
 
-                if (blackListedToken){
-                    res.status(400);
-                    return res.json({
-                        "error": "Token is black listed"
-                    })
-                } else {
-                    const accessToken = generateJWT(payload, process.env.ACCESS_TOKEN_SECRET, "1hr")
-                    res.json({
-                        accessToken
-                    })
-                }
-            } catch (error){
-                console.error('failed to fetch blacklisted token', error)
+            if (searchForm.data.min_price) {
+                console.log('search form min price hit', searchForm.data.min_price)
+                query.where('price', '>=', searchForm.data.min_price)
             }
-        })
-    }
+
+            if (searchForm.data.max_price) {
+                console.log('search form max price hit', searchForm.data.max_price)
+                query.where('price', '<=', searchForm.data.max_price)
+            }
+
+            if (searchForm.data.post_category_id && searchForm.data.post_category_id != 0) {
+                console.log('search form post category id hit =>', searchForm.data.post_category_id);
+
+                query.where('post_category_id', '=', searchForm.data.post_category_id);
+            }
+
+            if (searchForm.data.genres && searchForm.data.genres != 0) {
+                console.log('search form genres hit', searchForm.data.genres)
+
+                query.query(qb => {
+                    qb.join('genres_products', 'product_id', 'products.id');
+                    qb.where('genre_id', 'in', searchForm.data.genres.split(','));
+                });                
+            }
+
+            const products = await query.fetch({
+                withRelated:[   'post_category', 
+                                'genres', {
+                                'user': (queryBuild) => {
+                                                            queryBuild.select('id', 'name')
+                                                        }
+                                }
+                            ]
+            })
+
+            const user = await findUserById(req.params.userId);
+
+            res.render('admin/user-products', {
+                'products': products.toJSON(),
+                'user': user.toJSON(),
+                'searchForm': searchForm.toHTML(bootstrapField)
+            })
+        },
+        'empty': async (searchForm) => {
+
+            query.where('products.user_id', '=', req.params.userId);
+
+            const user = await findUserById(req.params.userId);
+
+            const products = await query.fetch({
+                withRelated:[   'post_category', 
+                                'genres', {
+                                'user': (queryBuild) => {
+                                                            queryBuild.select('id', 'name')
+                                                        }
+                                }
+                            ]
+            })
+
+            res.render('admin/user-products',{
+                'products': products.toJSON(),
+                'user': user.toJSON(),
+                'searchForm': searchForm.toHTML(bootstrapField)
+            })
+        }
+    })
 })
 
-router.delete('/blackList', async(req,res)=>{
+router.delete('/blacklist', async(req,res)=>{
 
-    jwt.verify(req.query.refreshToken, process.env.REFRESH_TOKEN_SECRET, (error,payload)=>{
+    console.log('blacklist route hit')
 
-        if (error){
-            return res.sendStatus(400);
-        } else {
+    const refreshToken = req.query.refreshToken;
+
+
+    if (error){
+        return res.sendStatus(400);
+    } else {
+           
+            console.log('blacklist jwt verify route hit')
             const blackListedToken = new BlackListedToken({
                 token: req.query.refreshToken,
                 date_of_blacklist: new Date()
-            })
+        })
             blackListedToken.save();
             res.json({
                 "success": "Token blacklisted"
             })
         }
-    })
 })
+
 
 
 

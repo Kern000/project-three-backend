@@ -10,14 +10,7 @@ const flash = require('connect-flash');
 const session = require('express-session');
 const FileStore = require('session-file-store')(session); //store session on server
 
-// Import non-global middlewares
-const {
-        checkSessionAuthentication,
-        checkAuthenticationWithJWT,
-        checkSessionPreference,
-        createCSRFWithExceptions,
-        sessionExpiryRouting
-} = require('./middleware');
+const csurf = require('csurf');
 
 // Initialize Express
 let app = express();
@@ -51,6 +44,28 @@ app.use(session({
 // flash message for handlebar pages
 app.use(flash());
 
+const csrfInstance = csurf();
+
+app.use(function(req, res, next) {
+
+    if (req.url === "/checkout/process-payment") {
+        return next();
+    }
+    console.log('csrf with exception hit')
+    csrfInstance(req, res, next);
+})
+
+app.use(function(error, req, res, next){
+    console.log('session expiry routing hit');
+
+    if(error && error.code == "EBADCSRFTOKEN"){
+        req.flash("error", "Session expired, login and try again");
+        res.redirect('/');
+    } else {
+        next();
+    }
+})
+
 // Attach csrf token for templates usage
 app.use(function(req,res,next){
     if(req.csrfToken){
@@ -68,8 +83,12 @@ app.use(function(req,res,next){
     next();
   })
 
+
 // Enable user info for template
 app.use(function(req, res, next){
+    if (req.session.superAdmin){
+        res.locals.superAdmin = req.session.superAdmin
+    }
     if (req.session.user){
       res.locals.user = req.session.user;
     }
@@ -88,8 +107,8 @@ const checkoutRoutes = require('./routes/checkout');
 const cartRoutes = require('./routes/cart');
 
 async function main(){
-    app.use('/admin', superAdminRoutes);
 
+    app.use('/admin', superAdminRoutes);
 
     app.use('/', landingRoutes);
     app.use('/products', productRoutes);

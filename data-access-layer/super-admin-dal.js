@@ -12,6 +12,7 @@ const retrieveAllUsers = async () => {
 }
 
 const findUserById = async (userId) => {
+    console.log('findUserById dal hit');
     try{
         const userFoundById = await User.where({
             'id': userId
@@ -19,6 +20,7 @@ const findUserById = async (userId) => {
             require:true,
             withRelated: ['order_items', 'products']
         })
+        return userFoundById;
     } catch (error){
         console.error('error finding user by Id', error)
     }

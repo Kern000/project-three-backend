@@ -1,7 +1,7 @@
 {{#extends 'base'}}
 
 {{#block "content"}}
-<a href="/admin/products" class="mt-3 mb-3 btn btn-secondary btn-sm"> Go Back </a>
+<a href="#" onclick="goBack()" class="mt-3 mb-3 btn btn-secondary btn-sm"> Go Back </a>
 
 <h4> Create new product </h4>
 
@@ -62,6 +62,10 @@
         event.preventDefault();     //prevent clickthrough
         cloudinaryWidget.open();            //open embedded widget instead
     })
+
+    function goBack(){
+        window.history.back();
+    }
 </script>
 {{/block}}
 {{/extends}}

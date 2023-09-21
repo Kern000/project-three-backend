@@ -30,16 +30,16 @@
 
 <div class="d-flex align-items-center">
     <button id="search-toggle" class="btn btn-light btn-sm ms-2 mt-2 me-2" style="border: 1px solid silver;"> = </button>
-    <h5 class="ms-2 mt-2 mb-0">Users</h5>
+    <h5 class="ms-2 mt-2 mb-3">Users</h5>
 </div>
 
-<div class="container-fluid mt-3 ms-0">
+<div class="container-fluid mt-0 ms-2">
     <div class="row">
         <div id="search-form" class="col-md-2">
-            <form method="GET" style="max-width:230px">
+            <form method="GET" style="max-width:230px; margin-top: 15px;">
                 <h6> Search </h6>
                 <div style="font-family: Montserrat, sans-serif; font-size:13px; margin-top: 10px;">
-                    {{{userForm}}}
+                    {{{searchForm}}}
                 </div>
                 <input type="submit" class="mb-2 mt-3 btn btn-dark btn-sm"/>
             </form>
@@ -54,6 +54,8 @@
                         <th>Secret</th>
                         <th>Sales</th>
                         <th></th>
+                        <th></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,7 +67,13 @@
                         <td>{{this.secret}}</td>
                         <td>{{this.sales}}</td>
                         <td>
-                            <a href="/admin/users/{{this.user.id}}/delete" class="btn btn-danger btn-sm">Delete User info</a>
+                            <a href="/admin/users/{{this.id}}/delete" class="btn btn-danger btn-sm"> Delete User </a>
+                        </td>
+                        <td>
+                            <a href="/admin/users/{{this.id}}/products" class="btn btn-secondary btn-sm">User products</a>
+                        </td>
+                        <td>
+                            <a href="/admin/users/{{this.id}}/orders" class="btn btn-dark btn-sm">User orders</a>
                         </td>
                     </tr>
                     {{/each}}
@@ -95,5 +103,5 @@
 
 
 
-{{/block}}
+
 {{/extends}}

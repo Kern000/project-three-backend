@@ -86,10 +86,10 @@ const addProductListing = async (productForm) => {
     }
 }
 
-const findProductsByUser = async (userName) => {
+const findProductsByUserName = async (userName) => {
     
     try{
-        const productsFoundByUser = await Product
+        const productsFoundByUserName = await Product
             .innerJoin('users', 'products.user_id', 'users.id')
             .whereILike('user.name', `%${userName}`)
             .fetchAll({
@@ -102,12 +102,33 @@ const findProductsByUser = async (userName) => {
                                 }
                 ]
             })
-        return productsFoundByUser;
+        return productsFoundByUserName;
 
     } catch (error){
-        console.error('error finding product by Id', error)
+        console.error('error finding product by user name', error)
     }
 }
+
+const findProductsByUserId = async (userId) => {
+    
+    try{
+        const productsFoundByUserId = await Product.where({user_id: userId}).fetchAll({
+                withRelated: [  'post_category', 
+                                'genres', 
+                                {
+                                'user': (queryBuild) => {
+                                    queryBuild.select('id', 'name')
+                                    }
+                                }
+                ]
+            })
+        return productsFoundByUserId;
+
+    } catch (error){
+        console.error('error finding product by user id', error)
+    }
+}
+
 
 
 module.exports= {
@@ -115,6 +136,7 @@ module.exports= {
                     retrieveAllPostCategories,
                     retrieveAllGenres,
                     findProductById,
-                    findProductsByUser,
+                    findProductsByUserName,
+                    findProductsByUserId,
                     addProductListing
                 }

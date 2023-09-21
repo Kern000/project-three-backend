@@ -246,5 +246,96 @@ const createSearchForm = (post_category=[], genres=[]) => {
 };
 
 
-module.exports = { bootstrapField, createProductForm, createLoginForm, createRegisterForm, createSearchForm };
+const createUserSearchForm = () => {
+    return forms.create({
+        'id': fields.number({
+            label: "User Id",
+            required: false,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[
+                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+            ]
+        }),
+        'name': fields.string({
+            label: "Username",
+            required: false,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[
+                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+            ]
+        }),
+        'email': fields.string({
+            label: "Email address",
+            required: false,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[
+                validators.regexp(/^[a-zA-Z0-9._%+ -!@]+$/)
+            ]
+        })
+    })
+};
+
+const createUserProductsSearchForm = (post_category=[], genres=[]) => {
+    return forms.create({
+        'name': fields.string({
+            label: "Name of work",
+            required: false,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[
+                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+            ]
+        }),
+        'min_price': fields.number({
+            required: false,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[validators.min(0), validators.integer()]
+        }),
+        'max_price': fields.number({
+            required: false,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[validators.min(0), validators.integer()] 
+        }),
+        'post_category_id': fields.string({
+            label:'Post Category',
+            required: false,
+            errorAfterField: true,
+            widget: widgets.select(),
+            choices: post_category,
+            cssClasses: {
+                label: ['form-label']
+            }
+        }),
+        'genres': fields.string({
+            label: 'Genres',
+            required: false,
+            errorAfterField: true,
+            widget: widgets.select(),
+            choices: genres,
+            cssClasses: {
+                label: ['form-label']
+            }
+        })
+    })
+};
+
+
+module.exports = { bootstrapField, createProductForm, createLoginForm, createRegisterForm, createSearchForm, createUserSearchForm, createUserProductsSearchForm };
 
