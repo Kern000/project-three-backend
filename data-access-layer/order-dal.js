@@ -102,6 +102,7 @@ const retrieveOrderItemByOrderIdAndProduct = async (orderId, productId) => {
 const updateOrderItemQuantity = async (orderId = null, productId = null, updatedQuantity = null) => {
     try{
 
+
         let orderItem = await retrieveOrderItemByOrderIdAndProduct(orderId, productId);
 
         if (orderItem){
@@ -109,8 +110,7 @@ const updateOrderItemQuantity = async (orderId = null, productId = null, updated
             await knex('order_items').where({'order_id': orderId,
             'product_id': productId}).update({'quantity': updatedQuantity})
 
-            orderItem = await retrieveOrderItemByOrderIdAndProduct(orderId, productId);
-            return orderItem;
+            return await retrieveOrderItemByOrderIdAndProduct(orderId, productId);
         }
     } catch (error){
         console.error('Failed to update order item qty', error)

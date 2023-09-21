@@ -44,8 +44,8 @@
                 <td style="padding-top:12px;">{{this.date_time}}</td>
                 <td style="padding-top:12px;">{{this.fulfilled}}</td>
                 <td>
-                    <input type="number" value="{{this.quantity}}" id="newQuantity">
-                    <a href="/admin/orders/update-quantity/?orderId={{this.order_id}}&productId={{this.product_id}}&newQuantity={{this.quantity}}" class="btn btn-light btn-sm"> Update Qty </a>
+                    <input type="number" value="{{this.quantity}}" name="newQuantity" style="max-width:55px" id="newQuantity{{this.product_id}}">
+                    <a href="/admin/orders/update-quantity/?orderId={{this.order_id}}&productId={{this.product_id}}" id="update-button{{this.product_id}}" name="{{this.product_id}}" onclick="updateQuantity({{this.product_id}})" class="btn btn-light btn-sm"> Update Qty </a>
                 </td>
                 <td>
                     <a href="/admin/orders/update-status/?orderId={{this.order_id}}&productId={{this.product_id}}&updatedStatus={{this.fulfilled}}" class="btn btn-light btn-sm"> Update Fulfilment </a>
@@ -64,7 +64,16 @@
 {{/block}}
 {{#block 'js'}}
     <script>
-        
+        function updateQuantity(targeter) {
+            let newQuantityValue = document.querySelector(`#newQuantity${targeter}`).value;
+            let updateButton = document.querySelector(`#update-button${targeter}`);
+
+            let currentHref = updateButton.getAttribute('href');
+            let hrefToAdd = `&newQuantity=${newQuantityValue}`;
+            let updatedHref = `${currentHref}` + `${hrefToAdd}`
+                        
+            updateButton.setAttribute('href', updatedHref);
+        }
     </script>
 {{/block}}
 {{/extends}}

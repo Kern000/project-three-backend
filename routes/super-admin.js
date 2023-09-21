@@ -680,7 +680,7 @@ router.get('/orders/:orderId/update-order', [checkSessionAuthentication, checkAu
     })
 })
 
-router.get('/orders/update-quantity/', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
+router.get('/orders/update-quantity', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
 
     const orderId = req.query.orderId;
     const productId = req.query.productId;
@@ -693,6 +693,17 @@ router.get('/orders/update-quantity/', [checkSessionAuthentication, checkAuthent
     res.render('admin/order-update-one',{
         'order': order.toJSON()[0]
     })
+})
+
+router.post('/orders/update-quantity', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
+
+    const orderId = req.query.orderId;
+    const productId = req.query.productId;
+    const newQuantity = req.body.newQuantity;
+
+    await updateOrderItemQuantity(orderId, productId, newQuantity);
+    req.flash('success', 'Item quantity updated');
+    res.redirect(`/orders/${orderId}/update-order`);
 })
 
 router.get('/orders/update-status/', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
