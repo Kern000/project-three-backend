@@ -1,17 +1,29 @@
-const { Cart_Item } = require('../models');
+const { Cart_Item, Cart_Counter } = require('../models');
+
+const assignCartNumber = async () => {
+    
+    const cartNumber = await Cart_Counter.fetch({
+        'require': true
+    });
+
+    const newCartNumber = cartNumber.get('id') + 1;
+
+    await Cart_Counter.where({id:cartNumber}).save({ id: newCartNumber });
+
+    return cartNumber;
+}
+
+const assignCartDateTime = async () => {
+
+    timeOfCart = new Date();
+
+    return timeOfCart;
+}
 
 const retrieveAllCarts = async () => {
     try{
         const allCarts = await Cart_Item.collection().fetch({
-            'require': false,
-            'withRelated': ['product', 
-                            'product.post_category', 
-                            'product.genres', 
-                            {
-                            'product.user': (queryBuild) => {
-                                queryBuild.select('id', 'name')
-                            }
-            }]
+            'require': false
         })
         return allCarts;
     } catch (error) {
@@ -22,20 +34,22 @@ const retrieveAllCarts = async () => {
 const retrieveUserCartItems = async (userId) => {
 
     try{
-        let userCartItems = await Cart_Item.collection()
-                        .where({'user_id': userId})
-                        .fetch({
-                            'require': false,
-                            'withRelated': ['product', 
-                                            'product.post_category', 
-                                            'product.genres',
-                                            {
-                                            'product.user': (queryBuild) => {
-                                                queryBuild.select('id', 'name')
-                                            }
-                            }]
-                        })
+        let userCartItems = await Cart_Item.collection().where({'user_id': userId}).fetch({
+            'require':false
+        })                        
         return userCartItems;
+    } catch (error){
+        console.error('error retrieving cart items', error)
+    }
+}
+
+const retrieveSingleCartItems = async (cartId) => {
+
+    try{
+        let CartItems = await Cart_Item.collection().where({'cart_id': cartId}).fetch({
+            'require':false
+        })                        
+        return CartItems;
     } catch (error){
         console.error('error retrieving cart items', error)
     }
@@ -50,12 +64,17 @@ const deleteCart = async (userId) => {
     }
 }
 
-const createNewCartItem = async (userId, productId, quantity) => {
+const createNewCartItem = async (cartId, userId, productId, productName, price, quantity, dateTime) => {
     try{
+
         const newCartItem = new Cart_Item({
+            'cart_id': cartId,
             'user_id': userId,
             'product_id': productId,
-            'quantity': quantity
+            'product_name': productName,
+            'price': price,
+            'quantity': quantity,
+            'date_time': dateTime
         })
         await newCartItem.save();
         return newCartItem;
@@ -64,10 +83,11 @@ const createNewCartItem = async (userId, productId, quantity) => {
     }
 }
 
-const fetchCartItemByUserAndProduct = async (userId, productId) => {
+const fetchCartItemByUserAndProduct = async (userId, cartId, productId) => {
     try{
         const foundCartItem = await Cart_Item.where({
             'user_id': userId,
+            'cart_id': cartId,
             'product_id': productId
         }).fetch({
             require: false
@@ -78,10 +98,10 @@ const fetchCartItemByUserAndProduct = async (userId, productId) => {
     }
 }
 
-const updateCartItemQuantity = async (cartItem = null, userId = null, productId = null, updatedQuantity = null) => {
+const updateCartItemQuantity = async (cartItem = null, userId = null, cartId = null, productId = null, updatedQuantity = null) => {
     try{
         if(!cartItem){
-            cartItem = await fetchCartItemByUserAndProduct(userId, posterId);
+            cartItem = await fetchCartItemByUserAndProduct(userId, cartId, productId);
         }
 
         if (cartItem){
@@ -93,9 +113,9 @@ const updateCartItemQuantity = async (cartItem = null, userId = null, productId 
     }
 }
 
-const removeEntryFromCart = async (userId, posterId) => {
+const removeEntryFromCart = async (userId, cartId, productId) => {
     try{
-        const cartItemForDeletion = await fetchCartItemByUserAndProduct(userId, posterId);
+        const cartItemForDeletion = await fetchCartItemByUserAndProduct(userId, cartId, productId);
         console.log(cartItemForDeletion)
         await cartItemForDeletion.destroy();
     } catch (error) {
@@ -103,12 +123,25 @@ const removeEntryFromCart = async (userId, posterId) => {
     }
 }
 
+const removeEntireCart = async (cartId) => {
+    try{
+        const cartForDeletion = await retrieveSingleCartItems(cartId);
+        await cartForDeletion.destroy();
+    } catch (error) {
+        console.error('failed to delete cart item', error)
+    }
+}
+
 module.exports = {
+                    assignCartNumber,
+                    assignCartDateTime,
                     retrieveAllCarts,
                     retrieveUserCartItems,
                     deleteCart,
                     createNewCartItem, 
                     fetchCartItemByUserAndProduct, 
                     updateCartItemQuantity, 
-                    removeEntryFromCart
+                    removeEntryFromCart,
+                    retrieveSingleCartItems,
+                    removeEntireCart
 }

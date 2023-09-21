@@ -1,18 +1,31 @@
+const { knex } = require('../bookshelf');
 const { Order_Item }= require('../models');
+
+const assignOrderNumber = async () => {
+    
+    const orderNumber = await Order_Counter.fetch({
+        'require': true
+    });
+
+    const newOrderNumber = orderNumber.get('id') + 1;
+
+    await Order_Counter.where({id:orderNumber}).save({ id: newOrderNumber });
+
+    return orderNumber;
+}
+
+const assignOrderDateTime = async () => {
+
+    timeOfOrder = new Date();
+
+    return timeOfOrder;
+}
+
 
 const retrieveAllOrders = async () => {
     try{
         const allOrders = await Order_Item.collection().fetch({
-            'require': false,
-            'withRelated': ['cart_item',
-                            'product',
-                            'product.post_category',
-                            'product.genres',
-                            {
-                            'product.user': (queryBuild) => {
-                                queryBuild.select('id', 'name')
-                            }
-            }]
+            'require': false        
         })
         return allOrders;
     } catch (error) {
@@ -20,25 +33,29 @@ const retrieveAllOrders = async () => {
     }
 }
 
-const retrieveOrderByOrderId = async (orderId) => {
+const retrieveOrderByUserId = async (userId) => {
     try{
         const userOrder = await Order_Item.collection()
-                        .where({'id': orderId})
+                        .where({'user_id': userId})
                         .fetch({
                             'require': false,
-                            'withRelated': ['cart_item',
-                                            'product',
-                                            'product.post_category',
-                                            'product.genres',
-                                            {
-                                            'product.user': (queryBuild) => {
-                                                queryBuild.select('id', 'name')
-                                            }
-                            }]
                         })
         return userOrder;
     } catch (error){
         console.error('error retrieving user orders', error)
+    }
+}
+
+
+const retrieveOrderByOrderId = async (orderId) => {
+    try{
+        const userOrder = await Order_Item.collection().where({'order_id': orderId})
+                        .fetch({
+                            'require': false,
+                        })
+        return userOrder;
+    } catch (error){
+        console.error('error retrieving user order by Id', error)
     }
 }
 
@@ -51,65 +68,102 @@ const deleteOrder = async (orderId) => {
     }
 }
 
-const retrieveOrderItemByUserAndProduct = async (userId, productId) => {
+const retrieveOrderItemByUserAndProduct = async (userId, orderId, productId) => {
     try{
-        const foundOrderItem = await Order_Item.where({
+        const foundOrderItem = await Order_Item.collection().where({
             'user_id': userId,
+            'order_id': orderId,
             'product_id': productId
         }).fetch({
             require: false
         })
         return foundOrderItem;
     } catch (error){
-        console.error('error fetching order item by id and product', error)
+        console.error('error fetching order item by user id, order id, and product id', error)
     }
 }
 
-const createNewOrderItem = async (userId, productId, quantity) => {
+
+
+const retrieveOrderItemByOrderIdAndProduct = async (orderId, productId) => {
     try{
-        const newOrderItem = new Order_Item({
-            'user_id': userId,
-            'product_id': productId,
-            'quantity': quantity
+        const foundOrderItem = await Order_Item.collection().where({
+            'order_id': orderId,
+            'product_id': productId
+        }).fetch({
+            require: false
         })
-        await newOrderItem.save();
-        return newOrderItem;
-    } catch {
-        console.error('error creating order item', error)
+        return foundOrderItem;
+    } catch (error){
+        console.error('error fetching order item by order id and product', error)
     }
 }
 
-const updateOrderItemQuantity = async (orderItem = null, userId = null, productId = null, updatedQuantity = null) => {
+const updateOrderItemQuantity = async (orderId = null, productId = null, updatedQuantity = null) => {
     try{
-        if(!orderItem){
-            orderItem = await retrieveOrderItemByUserAndProduct(userId, productId);
-        }
+
+        let orderItem = await retrieveOrderItemByOrderIdAndProduct(orderId, productId);
 
         if (orderItem){
-            orderItem.set('quantity', updatedQuantity);
-            await orderItem.save();
+
+            await knex('order_items').where({'order_id': orderId,
+            'product_id': productId}).update({'quantity': updatedQuantity})
+
+            orderItem = await retrieveOrderItemByOrderIdAndProduct(orderId, productId);
+            return orderItem;
         }
     } catch (error){
         console.error('Failed to update order item qty', error)
     }
 }
 
-const removeOrderItem = async (userId, posterId) => {
+const updateOrderFulfilment = async (orderId = null, productId = null, updatedStatus = null) => {
     try{
-        const orderItemForDeletion = await retrieveOrderItemByUserAndProduct(userId, posterId);
-        console.log('Item deleted', orderItemForDeletion)
-        await orderItemForDeletion.destroy();
+
+        let orderItem = await retrieveOrderItemByOrderIdAndProduct(orderId, productId);
+        let newStatus;
+
+        updatedStatus === 'Yes'? newStatus = 'No': newStatus = 'Yes'
+
+        console.log('newStatus', newStatus)
+        
+        if (orderItem){
+
+            await knex('order_items').where({'order_id': orderId,
+            'product_id': productId}).update({'fulfilled': newStatus})
+
+            orderItem = await retrieveOrderItemByOrderIdAndProduct(orderId, productId);
+            console.log('should be updated', orderItem.toJSON())
+            return orderItem;
+        }
+    } catch (error){
+        console.error('Failed to update fulfilment', error)
+    }
+}
+
+const removeOrderItem = async (orderId, productId) => {
+    try{
+        const orderItemForDeletion = await retrieveOrderItemByOrderIdAndProduct(orderId, productId);
+        console.log('Item pending deletion', orderItemForDeletion)
+
+        await knex('order_items').where({'order_id': orderId,
+        'product_id': productId}).del()
+
     } catch (error) {
         console.error('failed to delete order item', error)
     }
 }
 
 module.exports =    {
+                        assignOrderDateTime,
+                        assignOrderNumber,
                         retrieveAllOrders,
+                        retrieveOrderByUserId,
                         retrieveOrderByOrderId,
                         deleteOrder,
                         retrieveOrderItemByUserAndProduct,
-                        createNewOrderItem,
+                        retrieveOrderItemByOrderIdAndProduct,
                         updateOrderItemQuantity,
+                        updateOrderFulfilment,
                         removeOrderItem
                     }

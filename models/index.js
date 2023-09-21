@@ -59,34 +59,10 @@ const User = bookshelf.model('User',{
 
 const Cart_Item = bookshelf.model('Cart_Item',{
     tableName: 'cart_items',
-
-    product(){
-        return this.belongsTo('Product')
-    },
-
-    order_item(){
-        return this.belongsTo('Order_Item')
-    },
-
-    user(){
-        return this.belongsTo('User')
-    }
 })
 
 const Order_Item = bookshelf.model('Order_Item',{
-    tableName: 'order_items',
-
-    cart_item(){
-        return this.belongsTo('Cart_Item')
-    },
-
-    user(){
-        return this.belongsTo('User')
-    },
-
-    product(){
-        return this.belongsTo('Product')
-    }
+    tableName: 'order_items'
 })
 
 const Super_Admin = bookshelf.model('Super_Admin', {
@@ -109,7 +85,13 @@ const Session = bookshelf.model("Session",{
     }
 })
 
+const Cart_Counter = bookshelf.model("Cart_Counter",{
+    tableName: 'cart_counting'
+})
 
+const Order_Counter = bookshelf.model("Order_Counter",{
+    tableName: 'order_counting'
+})
 
 module.exports = {  
                     Product, 
@@ -120,5 +102,7 @@ module.exports = {
                     Order_Item,
                     Super_Admin,
                     BlackListedToken,
-                    Session
+                    Session,
+                    Cart_Counter,
+                    Order_Counter
                 }

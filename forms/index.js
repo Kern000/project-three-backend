@@ -337,5 +337,92 @@ const createUserProductsSearchForm = (post_category=[], genres=[]) => {
 };
 
 
-module.exports = { bootstrapField, createProductForm, createLoginForm, createRegisterForm, createSearchForm, createUserSearchForm, createUserProductsSearchForm };
+const createCartSearchForm = () => {
+    return forms.create({
+        'cart_id': fields.number({
+            label: "Cart Id",
+            required: false,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[
+                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+            ]
+        }),
+        'user_id': fields.string({
+            label: "User Id",
+            required: false,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[
+                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+            ]
+        })
+    })
+};
+
+const createOrderSearchForm = () => {
+    return forms.create({
+        'order_id': fields.number({
+            label: "Order Id",
+            required: false,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[
+                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+            ]
+        }),
+        'user_id': fields.string({
+            label: "User Id",
+            required: false,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[
+                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+            ]
+        }),
+        'product_id': fields.string({
+            label: "Product Id",
+            required: false,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[
+                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+            ]
+        }),
+        'seller_id': fields.string({
+            label: "Seller Id",
+            required: false,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[
+                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+            ]
+        }),
+        'fulfilment': fields.string({
+            label: "Fulfilmment",
+            required: false,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[
+                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+            ]
+        })
+    })
+};
+
+module.exports = { bootstrapField, createProductForm, createLoginForm, createRegisterForm, createSearchForm, createUserSearchForm, createUserProductsSearchForm, createCartSearchForm, createOrderSearchForm };
 

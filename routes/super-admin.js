@@ -6,7 +6,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
 // ORM relations
-const { Super_Admin, Product, User, BlackListedToken, Session } = require('../models');
+const { Super_Admin, Product, User, BlackListedToken, Session, Cart_Item, Order_Item } = require('../models');
 
 // Forms
 const { bootstrapField, 
@@ -15,7 +15,10 @@ const { bootstrapField,
         createSearchForm, 
         createRegisterForm, 
         createUserSearchForm, 
-        createUserProductsSearchForm } = require('../forms'); 
+        createUserProductsSearchForm,
+        createCartSearchForm,
+        createOrderSearchForm
+     } = require('../forms'); 
 
 // DAL logics with spare DAL methods for usage when not using DB query
 const { retrieveAllProducts,
@@ -25,7 +28,8 @@ const { retrieveAllProducts,
         findProductsByUserId,
         addProductListing } = require("../data-access-layer/products-dal");
 const { retrieveAllUsers, findUserById } = require("../data-access-layer/super-admin-dal");
-const { retrieveAllOrders, retrieveOrderByOrderId } = require("../data-access-layer/order-dal");
+const { retrieveAllOrders, retrieveOrderByOrderId, updateOrderItemQuantity, updateOrderFulfilment, retrieveOrderItemByOrderIdAndProduct, removeOrderItem } = require("../data-access-layer/order-dal");
+const { retrieveAllCarts, retrieveUserCartItems, retrieveSingleCartItems } = require("../data-access-layer/cart-dal")
 
 // Authentication
 const {
@@ -456,7 +460,7 @@ router.post('/users/:userId/delete', [checkSessionAuthentication, checkAuthentic
     res.redirect('/admin/users');
 })
 
-router.get('/users/:userId/products',  [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
+router.get('/users/:userId/products', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
     
     console.log('user products route hit');
 
@@ -549,12 +553,200 @@ router.get('/users/:userId/products',  [checkSessionAuthentication, checkAuthent
     })
 })
 
+router.get('/carts', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
+    
+    const cartSearchForm = createCartSearchForm();
+
+    const query= Cart_Item.collection();
+
+    cartSearchForm.handle(req, {
+        'success': async (cartSearchForm) => {
+            console.log('carts search route hit')
+
+            if (cartSearchForm.data.cart_id) {
+                console.log('search form id hit', cartSearchForm.data.cart_id)
+                query.where('cart_id', '=', cartSearchForm.data.cart_id)
+            }
+
+            if (cartSearchForm.data.user_id) {
+                console.log('search form id hit', cartSearchForm.data.user_id)
+                query.where('user_id', '=', cartSearchForm.data.user_id)
+            }
+
+            const carts = await query.orderBy('cart_id', 'desc').fetch()
+
+            res.render('admin/carts', {
+                'carts': carts.toJSON(),
+                'searchForm': cartSearchForm.toHTML(bootstrapField)
+            })
+        },
+        'empty': async (cartSearchForm) => {
+
+            const carts = await query.orderBy('cart_id', 'desc').fetch()
+
+            res.render('admin/carts',{
+                'carts': carts.toJSON(),
+                'searchForm': cartSearchForm.toHTML(bootstrapField)
+            })
+        }
+    })  
+})
+
+router.get('/carts/:cartId/delete-cart', [checkSessionAuthentication, checkAuthenticationWithJWT], async (req,res)=>{
+    
+    let cartId = req.params.cartId;
+    
+    const cartItems = await retrieveSingleCartItems(cartId);
+    console.log(cartItems.toJSON())
+
+    res.render('admin/cart-delete', {
+        'cartItems': cartItems.toJSON()
+    })
+})
+
+router.post('/carts/:cartId/delete-cart', [checkSessionAuthentication, checkAuthenticationWithJWT], async (req,res)=>{
+
+    console.log('cart delete route hit');
+
+    let cartId = req.params.cartId;
+
+    await Cart_Item.query().where({ 'cart_id': cartId }).del();
+
+    req.flash('success', `Cart Deleted`)
+    res.redirect('/admin/carts');
+})
+
+router.get('/orders', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
+    
+    const orderSearchForm = createOrderSearchForm();
+
+    const query= Order_Item.collection();
+
+    orderSearchForm.handle(req, {
+        'success': async (orderSearchForm) => {
+            console.log('order search route hit')
+
+            if (orderSearchForm.data.order_id) {
+                console.log('search form id hit', orderSearchForm.data.order_id)
+                query.where('order_id', '=', orderSearchForm.data.order_id)
+            }
+
+            if (orderSearchForm.data.user_id) {
+                console.log('search form id hit', orderSearchForm.data.user_id)
+                query.where('user_id', '=', orderSearchForm.data.user_id)
+            }
+
+            if (orderSearchForm.data.product_id) {
+                console.log('search form id hit', orderSearchForm.data.product_id)
+                query.where('product_id', '=', orderSearchForm.data.product_id)
+            }
+
+            if (orderSearchForm.data.seller_id) {
+                console.log('search form id hit', orderSearchForm.data.seller_id)
+                query.where('seller_id', '=', orderSearchForm.data.seller_id)
+            }
+
+            if (orderSearchForm.data.fulfilment) {
+                console.log('search form id hit', orderSearchForm.data.fulfilment)
+                query.where('fulfilled', 'like', '%' + orderSearchForm.data.fulfilment + '%')
+            }
+
+            const orders = await query.orderBy('order_id', 'desc').fetch()
+
+            res.render('admin/orders', {
+                'orders': orders.toJSON(),
+                'searchForm': orderSearchForm.toHTML(bootstrapField)
+            })
+        },
+        'empty': async (orderSearchForm) => {
+
+            const orders = await query.orderBy('cart_id', 'desc').fetch()
+
+            res.render('admin/orders',{
+                'orders': orders.toJSON(),
+                'searchForm': orderSearchForm.toHTML(bootstrapField)
+            })
+        }
+    })  
+})
+
+router.get('/orders/:orderId/update-order', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
+
+    let orderId = req.params.orderId;
+    const orders = await retrieveOrderByOrderId(orderId);
+
+    res.render('admin/order-update',{
+        'orders': orders.toJSON()
+    })
+})
+
+router.get('/orders/update-quantity/', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
+
+    const orderId = req.query.orderId;
+    const productId = req.query.productId;
+    const newQuantity = req.query.newQuantity;
+    console.log('orderId:', orderId, 'productId:', productId, 'newQuantity', newQuantity);
+
+    let order = await updateOrderItemQuantity(orderId, productId, newQuantity);
+    console.log("this is updated order", order.toJSON())
+
+    res.render('admin/order-update-one',{
+        'order': order.toJSON()[0]
+    })
+})
+
+router.get('/orders/update-status/', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
+
+    const orderId = req.query.orderId;
+    const productId = req.query.productId;
+    let updatedStatus = req.query.updatedStatus;
+    console.log('orderId:', orderId, 'productId:', productId, 'updatedStatus', updatedStatus);
+
+    let order = await updateOrderFulfilment(orderId, productId, updatedStatus);
+    console.log("this is updated status", order.toJSON())
+
+    res.render('admin/order-update-status',{
+        'order': order.toJSON()[0]
+    })
+})
+
+
+router.get('/orders/delete-item/', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
+
+    const orderId = req.query.orderId;
+    const productId = req.query.productId;
+
+    let order = await retrieveOrderItemByOrderIdAndProduct(orderId, productId);
+    console.log("this is order item to delete", order.toJSON())
+
+    res.render('admin/order-delete',{
+        'order': order.toJSON()[0]
+    })
+})
+
+router.post('/orders/delete-item/', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
+
+    const orderId = req.query.orderId;
+    const productId = req.query.productId;
+ 
+    console.log('order delete route hit');
+
+    const orderItem =await removeOrderItem(orderId, productId);
+
+    req.flash('success', `Order Item Deleted`)
+    res.redirect(`/admin/orders/${orderId}/update-order`);
+})
+
+
+
+
+
+// Extra route failsafe to delete refresh Token (not yet tested)
 router.delete('/blacklist', async(req,res)=>{
 
     console.log('blacklist route hit')
 
     const refreshToken = req.query.refreshToken;
-
 
     if (error){
         return res.sendStatus(400);
@@ -577,19 +769,5 @@ router.delete('/blacklist', async(req,res)=>{
 
 
 
-router.get('/orders', async (req,res)=>{
-    let orders = await retrieveAllOrders();
-    res.render('admin/orders',{
-        'orders': orders.toJSON()
-    })
-})
-
-router.post('/orders/:orderId/delete', async(req,res)=>{
-    let userId = req.params.orderId;
-    const order = await retrieveOrderByOrderId(userId);
-
-    await order.destroy();
-    res.redirect('/admin/orders')
-})
 
 module.exports = router;

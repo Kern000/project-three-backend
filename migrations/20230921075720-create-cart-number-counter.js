@@ -15,16 +15,16 @@ exports.setup = function(options, seedLink) {
 };
 
 exports.up = function(db) {
-  return db.addColumn('order_items', 'quantity',
-    {
-      "type":"int",
-      "unsigned": true
+  return db.createTable('cart_counting', {
+    id:{
+      type: 'int',
+      defaultValue: 1
     }
-  )
+  })
 };
 
 exports.down = function(db) {
-  return db.removeColumn('order_items', 'quantity');
+  return db.dropTable('cart_counting')
 };
 
 exports._meta = {
