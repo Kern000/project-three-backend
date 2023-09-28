@@ -275,6 +275,9 @@ router.get('/products/:productId/update', [checkSessionAuthentication, checkAuth
 })
 
 router.post('/products/:productId/update', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
+
+    console.log('update route for admin hit')
+
     const productId = req.params.productId;
     const product = await findProductById(productId);
 
@@ -294,6 +297,7 @@ router.post('/products/:productId/update', [checkSessionAuthentication, checkAut
             await product.genres().detach(indicatedGenres);
             await product.genres().attach(form.data.genres.split(','));
 
+            req.flash("success", "product updated");
             res.redirect('/admin/products')
          },
          "error": (form)=>{

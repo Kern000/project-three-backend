@@ -88,7 +88,7 @@ const checkAuthenticationWithJWT = (req, res, next) => {
                 }
             } else {
                 console.log('Login Access token successful')
-                req.user = payload;
+                // req.user = payload;
                 next();
             }
         })

@@ -3,7 +3,7 @@ const router = express.Router();
 const { Product } = require('../models');
 
 router.get('/', async(req,res)=>{
-    console.log('landing get route hit');
+    console.log('landing get route hit, this is headers', req.headers);
 
     let products = await Product.collection().fetch({
         withRelated:['post_category', 'genres']

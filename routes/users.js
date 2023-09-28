@@ -6,12 +6,16 @@ const jwt = require('jsonwebtoken');
 
 const { User } = require('../models');
 
-const {findProductsByUserId} = require('../service-layer/products-service')
+const {findProductsByUserId} = require('../service-layer/products-service');
+const {retrieveOrderByUserId} = require('../service-layer/order-service');
+const {retrieveUserCartItems} = require('../service-layer/cart-service');
+
 
 const {
     checkUserAuthenticationWithJWT,
     checkUserSessionAuthentication
 } = require('../middleware');
+const session = require('express-session');
 
 const generateJWT = (user, tokenSecret, expirationTime) => {
     return jwt.sign({
@@ -28,16 +32,14 @@ const getHashedPassword = (password) => {
     return hashedPassword;
 }
 
-router.post('/try/login', async(req, res)=>{
- 
-    console.log('post login route hit')
-   
-    console.log('requestbody here', req.body)
+router.post('/login', async(req, res)=>{
+
+    console.log('login route hit, requestbody here', req.body)
 
     try {
         let foundUser = await User.where({
             email: req.body.email,
-            password: req.body.password
+            password: getHashedPassword(req.body.password)
         }).fetch({
             require: false
         });
@@ -50,65 +52,85 @@ router.post('/try/login', async(req, res)=>{
         console.log('userId route =>', userId)
         console.log('userName route =>', userName)
 
-        if (foundUser){
-            const accessToken = generateJWT(foundUser.toJSON(), process.env.ACCESS_TOKEN_SECRET, "1hr");
-            const refreshToken = generateJWT(foundUser.toJSON(), process.env.REFRESH_TOKEN_SECRET, "7d");
-            
-            req.session.user = {
-                id: foundUser.get('id'),
-                name: foundUser.get('name'),
-                email: foundUser.get('email'),
-                ipAddress: req.ip,
-                date: new Date(),
-            }
+        try {
+            if (foundUser){
+                const accessToken = generateJWT(foundUser.toJSON(), process.env.ACCESS_TOKEN_SECRET, "1hr");
+                const refreshToken = generateJWT(foundUser.toJSON(), process.env.REFRESH_TOKEN_SECRET, "7d");
+                
+                req.session.user = {
+                    id: foundUser.get('id'),
+                    name: foundUser.get('name'),
+                    email: foundUser.get('email'),
+                    ipAddress: req.ip,
+                    date: new Date(),
+                }
 
-            res.json({
-                accessToken, refreshToken, id: userId, name: userName
-            })
-        } else {
-            res.sendStatus(403)
+                console.log('route here accessToken', accessToken)
+                console.log('route here refreshToken', refreshToken)
+                console.log('session here', req.session.user)
+
+                res.json({
+                    "accessToken": accessToken, "refreshToken": refreshToken, "userId": req.session.user.id, "userName": userName
+                })
+            } else {
+                res.status(403).send("User not found")
+            }
+        } catch (error){
+            console.error("Fail to sign JWT", error)
+            res.status(500).send("authentication failed")
         }
     } catch (error){
-        console.error('error in fetching with model', error)
+        console.error("Unable to retrieve user", error)
+        res.status(500).send("Internal server error")
+    }
+})
+
+router.post('/register', async(req, res)=>{
+
+    try{
+        let foundUser = await User.where({
+            'email': req.body.email,
+            'password': getHashedPassword(req.body.password)
+            }).fetch({
+                require: false
+            });
+
+        try{   
+            if (foundUser){
+                res.status(400).send("Email already in use");    
+            } else {
+                const newUser = new User();
+                newUser.set({
+                    name: req.body.name,
+                    email: req.body.email,
+                    password: getHashedPassword(req.body.password),
+                    secret: req.body.secret
+                })
+                await newUser.save();       
+                res.sendStatus(202);
+            }
+        } catch (error) {
+            console.error('fail to register user to db', error)
+            res.sendStatus(500)
+        }
+    } catch {
+        console.error('Internal error', error);
+        res.sendStatus(500)
     }
 })
 
 router.get('/dashboard/:userId', async(req, res)=>{
 
-    let userProducts = await findProductsByUserId()
-
-    res.json({"products":userProducts.toJSON()})
-
-})
-
-router.post('/register', async(req, res)=>{
-
-    let foundUser = await User.where({
-        'email': req.body.email,
-        'password': getHashedPassword(req.body.password)
-        }).fetch({
-            require: false
-        });
-
-    if (foundUser){
-        res.status(400).json({"error": "Email already in use"});
-    } else {
-
-        const newUser = new User();
-
-        newUser.set({
-            name: req.body.name,
-            email: req.body.email,
-            password: getHashedPassword(req.body.password)
-        })
-        await newUser.save();
-
-        const accessToken = generateJWT(foundUser.toJSON(), process.env.ACCESS_TOKEN_SECRET, "4w");
-        const refreshToken = generateJWT(foundUser.toJSON(), process.env.REFRESH_TOKEN_SECRET, "12w");
+    if (req.params.userId === req.session.user.id){
         
-        res.json({accessToken, refreshToken})
+        let userProducts = await findProductsByUserId()
+        res.json({"products":userProducts.toJSON()})
+
+    } else {
+        res.sendStatus(403);
     }
 })
+
 
 module.exports = router;
 

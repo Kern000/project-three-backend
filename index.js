@@ -12,7 +12,6 @@ const FileStore = require('session-file-store')(session); //store session on ser
 
 // for csrf protection
 const csurf = require('csurf');
-const cookieParser = require('cookie-parser')
 
 // Initialize Express
 let app = express();
@@ -25,16 +24,13 @@ wax.setLayoutPath("./views/layout")
 // ## Global Middlewares ##
 
 // Enable cross origin resource sharing
+
 app.use(cors());
 
-// Enable forms in req
-app.use(
-    express.urlencoded({        //when method attribute set to post, enctype set to 'application/x-www-form-urlencoded', make the data available in req.body
-        extended: true         //will parse nested
-    })
-)
+app.use(express.json());
 
-app.use(cookieParser())
+// Enable forms in req
+app.use('/admin', express.urlencoded({ extended: false }));
 
 // create sessions on global route
 app.use(session({
@@ -44,25 +40,28 @@ app.use(session({
     saveUninitialized: true
 }));
 
-
 // flash message for handlebar pages
 app.use(flash());
 
-const csrfInstance = csurf({cookie: true});
+const csrfInstance = csurf();
 
 app.use(function(req, res, next) {
-
     if (req.url === "/checkout/process-payment") {
         return next();
     }
-    console.log('csrf with exception hit')
     
-    res.cookie('XSRF-TOKEN', req.csrfToken());
+    else if (req.url.startsWith('/admin')){
+        console.log('admin csrf hit')
+        csrfInstance(req, res, next);
+    } else {
 
-    console.log('cookie has csrf')
-
-    csrfInstance(req, res, next);
+    console.log('csrf with exception hit')
+    next()
+    }
 })
+
+
+
 
 app.use(function(error, req, res, next){
     console.log('session expiry routing hit');
@@ -103,6 +102,14 @@ app.use(function(req, res, next){
     }
     next();
 })
+
+// Logics
+
+// app.get('/get-csrf', (req,res) => {
+//     req.session.csrf = req.csrfToken();
+//     console.log("session here", req.session.csrf)
+//     res.json({"csrf":req.session.csrf})
+// })
 
 // Import routes and logics, define higher level route category
 
