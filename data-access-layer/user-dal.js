@@ -26,5 +26,7 @@ const findUserById = async (userId) => {
     }
 }
 
+
+
 module.exports = {retrieveAllUsers,findUserById};
 

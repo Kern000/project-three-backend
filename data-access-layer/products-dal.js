@@ -122,6 +122,7 @@ const findProductsByUserId = async (userId) => {
                                 }
                 ]
             })
+
         return productsFoundByUserId;
 
     } catch (error){

@@ -27,7 +27,7 @@ const { retrieveAllProducts,
         findProductById,
         findProductsByUserId,
         addProductListing } = require("../data-access-layer/products-dal");
-const { retrieveAllUsers, findUserById } = require("../data-access-layer/super-admin-dal");
+const { retrieveAllUsers, findUserById } = require("../data-access-layer/user-dal");
 const { retrieveAllOrders, retrieveOrderByOrderId, updateOrderItemQuantity, updateOrderFulfilment, retrieveOrderItemByOrderIdAndProduct, removeOrderItem } = require("../data-access-layer/order-dal");
 const { retrieveAllCarts, retrieveUserCartItems, retrieveSingleCartItems } = require("../data-access-layer/cart-dal")
 

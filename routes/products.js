@@ -5,14 +5,30 @@ const { retrieveAllProducts,
         retrieveAllPostCategories,
         retrieveAllGenres,
         findProductById,
-        addProductListing } = require("../data-access-layer/products-dal");
+        findProductsByUserId,
+        addProductListing } = require("../service-layer/products-service");
 
 router.get('/', async(req,res)=>{
 
     let products = await retrieveAllProducts();
-
+    console.log('This is what is fetched', products)
     res.json({'products': products.toJSON()})
 })
+
+router.get('/:productId', async(req,res)=>{
+    const productId = req.params.productId
+    let product = await findProductById(productId)
+
+    console.log(product)
+    res.json({'product': product.toJSON()});
+})
+
+router.get('/user/:userId', async(req,res)=>{
+    let userId = req.params.userId;
+    let userProducts = await findProductsByUserId(userId);
+    res.json({'products': userProducts.toJSON()})
+})
+
 
 router.get('/search', async(req,res)=>{
 

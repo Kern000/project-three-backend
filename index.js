@@ -10,7 +10,9 @@ const flash = require('connect-flash');
 const session = require('express-session');
 const FileStore = require('session-file-store')(session); //store session on server
 
+// for csrf protection
 const csurf = require('csurf');
+const cookieParser = require('cookie-parser')
 
 // Initialize Express
 let app = express();
@@ -28,9 +30,11 @@ app.use(cors());
 // Enable forms in req
 app.use(
     express.urlencoded({        //when method attribute set to post, enctype set to 'application/x-www-form-urlencoded', make the data available in req.body
-        extended: false         //will not parse nested
+        extended: true         //will parse nested
     })
 )
+
+app.use(cookieParser())
 
 // create sessions on global route
 app.use(session({
@@ -44,7 +48,7 @@ app.use(session({
 // flash message for handlebar pages
 app.use(flash());
 
-const csrfInstance = csurf();
+const csrfInstance = csurf({cookie: true});
 
 app.use(function(req, res, next) {
 
@@ -52,6 +56,11 @@ app.use(function(req, res, next) {
         return next();
     }
     console.log('csrf with exception hit')
+    
+    res.cookie('XSRF-TOKEN', req.csrfToken());
+
+    console.log('cookie has csrf')
+
     csrfInstance(req, res, next);
 })
 
@@ -112,7 +121,7 @@ async function main(){
 
     app.use('/', landingRoutes);
     app.use('/products', productRoutes);
-    app.use('/user', userRoutes);
+    app.use('/users', userRoutes);
     app.use('/cloudinary', cloudinaryRoutes);
     app.use('/cart', cartRoutes);
     app.use('/checkout', checkoutRoutes);

@@ -42,6 +42,7 @@ const Genre = bookshelf.model('Genre',{
 })
 
 const User = bookshelf.model('User',{
+    
     tableName: 'users',
 
     products(){

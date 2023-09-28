@@ -1,27 +1,33 @@
 const productsDataAccess = require('../data-access-layer/products-dal');
 
 const retrieveAllProducts = async () => {
-    await productsDataAccess.retrieveAllProducts();
+    let products = await productsDataAccess.retrieveAllProducts();
+    return products;
 }
 
 const retrieveAllPostCategories = async () => {
-    await productsDataAccess.retrieveAllPostCategories();
+    let postCategories = await productsDataAccess.retrieveAllPostCategories();
+    return postCategories;
 }
 
 const retrieveAllGenres = async () => {
-    await productsDataAccess.retrieveAllGenres();
+    let genres = await productsDataAccess.retrieveAllGenres();
+    return genres;
 }
 
 const findProductById = async (productId) => {
-    await productsDataAccess.findProductById(productId);
+    let product = await productsDataAccess.findProductById(productId);
+    return product;
 }
 
-const findProductsByUser = async (userName) => {
-    await productsDataAccess.findProductsByUser(userName);
+const findProductsByUserId = async (userId) => {
+    let products = await productsDataAccess.findProductsByUserId(userId);
+    return products;
 }
 
 const addProductListing = async (productForm) => {
-    await productsDataAccess.addProductListing(productForm);
+    let addProduct = await productsDataAccess.addProductListing(productForm);
+    return addProduct;
 }
 
 module.exports= {
@@ -29,6 +35,6 @@ module.exports= {
                     retrieveAllPostCategories,
                     retrieveAllGenres,
                     findProductById,
-                    findProductsByUser,
+                    findProductsByUserId,
                     addProductListing
                 }
