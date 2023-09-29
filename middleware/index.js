@@ -14,6 +14,7 @@ const checkSessionAuthentication = (req, res, next) => {
 }
 
 const checkAuthenticationWithJWT = (req, res, next) => {
+
     console.log('check Authentication with JWT hit')
 
     req.headers.authorization = req.session.superAdmin.accessToken;
@@ -98,37 +99,30 @@ const checkAuthenticationWithJWT = (req, res, next) => {
     }
 }
 
-const checkUserSessionAuthentication = (req, res, next) => {
-
-    console.log('check User session authentication hit')
-    if (req.session.user){
-        console.log('session auth passed!')
-        next();
-    } else {
-    res.status(401);
-    return res.send('(Session) User must be logged in to view page');
-    }
-}
-
 const checkUserAuthenticationWithJWT = (req, res, next) => {
-    console.log('check User Authentication with JWT hit')
 
     const authHeader = req.headers.authorization;
-    console.log(authHeader);
+    console.log('auth header here', authHeader);
 
     if(authHeader){
-        // const token = authHeader.split(" ")[1];
-        const token = authHeader;
+
+        const token = authHeader.split(" ")[1];
+
+        console.log('token here', token)
 
         jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function(error, payload){
             
+            console.log('jwt verify hit')
+
             if(error){
                 
                 if (error.message === "jwt expired"){
 
+                    console.log('jwt expired')    
                     return res.status(400).send("Login expired, please log in again")
 
                 } else {
+                    console.log('jwt verify error hit')
                     res.status(401);
                     return res.json({error})
                 }
@@ -136,21 +130,19 @@ const checkUserAuthenticationWithJWT = (req, res, next) => {
             } else {
                 console.log('Login successful')
                 req.user = payload;
+                console.log('req.user here', req.user)
                 next();
             }
         })
     } else {
+        console.log('unauth hit')
         res.status(401);
         res.send('User must be logged in to view page')
     }
 }
 
-
-
-
 module.exports =    {
                         checkSessionAuthentication,
                         checkAuthenticationWithJWT,
                         checkUserAuthenticationWithJWT,
-                        checkUserSessionAuthentication
                     }

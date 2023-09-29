@@ -10,10 +10,8 @@ const {findProductsByUserId} = require('../service-layer/products-service');
 const {retrieveOrderByUserId} = require('../service-layer/order-service');
 const {retrieveUserCartItems} = require('../service-layer/cart-service');
 
-
 const {
-    checkUserAuthenticationWithJWT,
-    checkUserSessionAuthentication
+    checkUserAuthenticationWithJWT
 } = require('../middleware');
 const session = require('express-session');
 
@@ -34,8 +32,6 @@ const getHashedPassword = (password) => {
 
 router.post('/login', async(req, res)=>{
 
-    console.log('login route hit, requestbody here', req.body)
-
     try {
         let foundUser = await User.where({
             email: req.body.email,
@@ -54,7 +50,7 @@ router.post('/login', async(req, res)=>{
 
         try {
             if (foundUser){
-                const accessToken = generateJWT(foundUser.toJSON(), process.env.ACCESS_TOKEN_SECRET, "1hr");
+                const accessToken = generateJWT(foundUser.toJSON(), process.env.ACCESS_TOKEN_SECRET, "3hr");
                 const refreshToken = generateJWT(foundUser.toJSON(), process.env.REFRESH_TOKEN_SECRET, "7d");
                 
                 req.session.user = {
@@ -67,6 +63,7 @@ router.post('/login', async(req, res)=>{
 
                 console.log('route here accessToken', accessToken)
                 console.log('route here refreshToken', refreshToken)
+                console.log('full session here', req.session)
                 console.log('session here', req.session.user)
 
                 res.json({
@@ -119,18 +116,37 @@ router.post('/register', async(req, res)=>{
     }
 })
 
-router.get('/dashboard/:userId', async(req, res)=>{
+router.get('/dashboard/:userId', [checkUserAuthenticationWithJWT], async(req, res)=>{
 
-    if (req.params.userId === req.session.user.id){
-        
-        let userProducts = await findProductsByUserId()
-        res.json({"products":userProducts.toJSON()})
+    console.log('dashboard get route hit')
+    console.log('req user id here', req.user.id)
 
+    if (req.user.id == req.params.userId){
+
+        console.log('passed user basic authorization // future to implement based on IAT')
+
+        try{
+
+            let userProducts = await findProductsByUserId(req.params.userId)
+
+            console.log('route received the following from DAL', userProducts)
+
+            if (userProducts.length > 0){
+
+                res.json({"products":userProducts.toJSON()})
+
+            } else {
+
+                res.status(204).json({error: "No products found"})
+            }
+
+        } catch (error) {
+            res.status(500).json({error: "Failed to fetch products"})
+        }
     } else {
-        res.sendStatus(403);
+        res.status(403).json({error: 'unauthorized user'})
     }
 })
-
 
 module.exports = router;
 

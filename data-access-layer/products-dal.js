@@ -111,6 +111,7 @@ const findProductsByUserName = async (userName) => {
 
 const findProductsByUserId = async (userId) => {
     
+    console.log('DAL hit')
     try{
         const productsFoundByUserId = await Product.where({user_id: userId}).fetchAll({
                 withRelated: [  'post_category', 
@@ -122,7 +123,8 @@ const findProductsByUserId = async (userId) => {
                                 }
                 ]
             })
-
+        
+        console.log('This is products search by userId DAL =>', productsFoundByUserId)
         return productsFoundByUserId;
 
     } catch (error){

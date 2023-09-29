@@ -61,8 +61,6 @@ app.use(function(req, res, next) {
 })
 
 
-
-
 app.use(function(error, req, res, next){
     console.log('session expiry routing hit');
 
