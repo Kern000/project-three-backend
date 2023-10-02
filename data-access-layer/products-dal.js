@@ -132,6 +132,54 @@ const findProductsByUserId = async (userId) => {
     }
 }
 
+const searchProductsBySearchForm = async (payload)=>{
+
+    const query= Product.collection();
+
+    const searchCriteria = payload
+    console.log('search payload =>', searchCriteria)
+
+    try{
+        if (searchCriteria.name) {
+            console.log('search form name hit', searchCriteria.name)
+            query.where('name', 'like', '%' + searchCriteria.name + '%')
+        }
+
+        if (searchCriteria.minPrice) {
+            console.log('search form min price hit', searchCriteria.minPrice)
+            query.where('price', '>=', searchCriteria.minPrice)
+        }
+
+        if (searchCriteria.maxPrice) {
+            console.log('search form max price hit', searchCriteria.maxPrice)
+            query.where('price', '<=', searchCriteria.maxPrice)
+        }
+
+        if (searchCriteria.postCategoryId) {
+            console.log('search form post category id hit =>', searchCriteria.postCategoryId);
+
+            query.where('post_category_id', '=', searchCriteria.postCategoryId);
+        }
+
+        if (searchCriteria.genreId && searchCriteria.genreId.length > 0) {
+            console.log('search form genres hit', searchCriteria.genreId)
+
+            query.query(qb => {
+                qb.join('genres_products', 'product_id', 'products.id');
+                qb.where('genre_id', 'in', searchCriteria.genreId);
+            });                
+        }
+
+        const products = await query.fetch({
+            withRelated:['post_category', 'genres']
+        })       
+        console.log('fetched products')
+        return products;
+
+    } catch (error) {
+        console.log('unable to fetch at products DAL =>', error)
+    }  
+}
 
 
 module.exports= {
@@ -141,5 +189,6 @@ module.exports= {
                     findProductById,
                     findProductsByUserName,
                     findProductsByUserId,
-                    addProductListing
+                    addProductListing,
+                    searchProductsBySearchForm
                 }

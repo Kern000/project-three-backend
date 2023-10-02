@@ -217,7 +217,7 @@ router.get('/products', [checkSessionAuthentication, checkAuthenticationWithJWT]
                 query.query(qb => {
                     qb.join('genres_products', 'product_id', 'products.id');
                     qb.where('genre_id', 'in', searchForm.data.genres.split(','));
-                });                
+                });
             }
 
             const products = await query.fetch({
@@ -241,7 +241,6 @@ router.get('/products', [checkSessionAuthentication, checkAuthenticationWithJWT]
             })
         }
     })
-
 })
 
 router.get('/products/:productId/update', [checkSessionAuthentication, checkAuthenticationWithJWT], async(req,res)=>{
@@ -756,7 +755,7 @@ router.post('/orders/delete-item/', [checkSessionAuthentication, checkAuthentica
 
 
 
-// Extra route failsafe to delete refresh Token (not yet tested)
+// Extra route failsafe to delete refresh Token
 router.delete('/blacklist', async(req,res)=>{
 
     console.log('blacklist route hit')
@@ -778,11 +777,6 @@ router.delete('/blacklist', async(req,res)=>{
             })
         }
 })
-
-
-
-
-
 
 
 module.exports = router;

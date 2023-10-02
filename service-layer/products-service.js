@@ -30,11 +30,17 @@ const addProductListing = async (productForm) => {
     return addProduct;
 }
 
+const searchProductsBySearchForm = async (payload) => {
+    let searchedProducts = await productsDataAccess.searchProductsBySearchForm(payload)
+    return searchedProducts;
+}
+
 module.exports= {
                     retrieveAllProducts,
                     retrieveAllPostCategories,
                     retrieveAllGenres,
                     findProductById,
                     findProductsByUserId,
-                    addProductListing
+                    addProductListing,
+                    searchProductsBySearchForm
                 }

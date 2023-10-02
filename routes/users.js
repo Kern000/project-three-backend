@@ -123,7 +123,7 @@ router.get('/dashboard/:userId', [checkUserAuthenticationWithJWT], async(req, re
 
     if (req.user.id == req.params.userId){
 
-        console.log('passed user basic authorization // future to implement based on IAT')
+        console.log('passed user basic authorization')
 
         try{
 
@@ -147,6 +147,10 @@ router.get('/dashboard/:userId', [checkUserAuthenticationWithJWT], async(req, re
         res.status(403).json({error: 'unauthorized user'})
     }
 })
+
+
+
+
 
 module.exports = router;
 

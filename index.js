@@ -117,6 +117,7 @@ const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/users');
 const superAdminRoutes = require('./routes/super-admin');
 const cloudinaryRoutes = require('./routes/cloudinary');
+const searchRoutes = require('./routes/search')
 const checkoutRoutes = require('./routes/checkout');
 const cartRoutes = require('./routes/cart');
 
@@ -127,6 +128,7 @@ async function main(){
     app.use('/', landingRoutes);
     app.use('/products', productRoutes);
     app.use('/users', userRoutes);
+    app.use('/search', searchRoutes)
     app.use('/cloudinary', cloudinaryRoutes);
     app.use('/cart', cartRoutes);
     app.use('/checkout', checkoutRoutes);

@@ -19,7 +19,7 @@ router.get('/:productId', async(req,res)=>{
     const productId = req.params.productId
     let product = await findProductById(productId)
 
-    console.log(product)
+    console.log('find product by id route hit', product)
     res.json({'product': product.toJSON()});
 })
 
@@ -218,6 +218,8 @@ router.post('/:productId/delete', async (req,res)=>{
     await product.destroy();
     res.json({"success":"item deleted"});
 })
+
+
 
 
 module.exports = router;
