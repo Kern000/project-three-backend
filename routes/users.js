@@ -230,7 +230,33 @@ router.post('/:productId/update', [checkUserAuthenticationWithJWT], async(req,re
     }
 })
 
+router.post('/:productId/delete', [checkUserAuthenticationWithJWT], async(req,res)=>{
 
+    console.log('delete route hit for user')
+
+    let userId = parseInt(req.query.userId)
+
+    if (req.user.id === userId){
+
+        let productId = req.params.productId;
+
+        try{
+            console.log('user finding product for deletion')
+
+            const product= await findProductById(productId);
+            console.log('item to be deleted', product.toJSON());
+
+            await product.destroy();
+            console.log('item deleted');
+
+            res.status(204).send("Item deleted, no regrets right?")
+        } catch (error){
+            res.status(400).send('fail to delete item')
+        }
+    } else {
+        res.status(401).send('action not authorized')
+    }
+})
 
 
 
