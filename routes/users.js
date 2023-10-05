@@ -258,6 +258,15 @@ router.post('/:productId/delete', [checkUserAuthenticationWithJWT], async(req,re
     }
 })
 
+router.get('/check-login', [checkUserAuthenticationWithJWT], (req,res)=>{
+    if (req.user){
+        console.log('jwt has not expired')
+        res.status(200).send('user is authenticated')
+    } else {
+        res.status(401).send('please login again')
+    }
+})
+
 
 
 module.exports = router;

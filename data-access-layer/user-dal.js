@@ -1,5 +1,7 @@
 const { default: knex } = require('knex');
 const { User, Product } = require('../models');
+const router = require('../routes/users');
+const { checkUserAuthenticationWithJWT } = require('../middleware');
 
 const retrieveAllUsers = async () => {
     console.log('retrieve all users hit')
@@ -133,6 +135,7 @@ const updateUserProductListing = async (payload) => {
         console.error('error updating product listing', error)
     }
 }
+
 
 
 

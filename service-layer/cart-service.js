@@ -12,6 +12,14 @@ const deleteCart = async (userId) => {
     await cartDataAccess.deleteCart(userId);
 }
 
+const cartCounter = async () => {
+    let cartNumber = await cartDataAccess.assignCartNumber();
+    return cartNumber;
+}
+
+
+
+
 const addToCart = async (userId, productId, quantity) => {
 
     const cartItem = await cartDataAccess.fetchCartItemByUserAndProduct(userId, productId);
@@ -24,19 +32,22 @@ const addToCart = async (userId, productId, quantity) => {
     }
 }
 
-const updateCartItemQuantity = async (userId, productId, updatedQuantity) => {
-    await cartDataAccess.updateCartItemQuantity(cartItem=null, userId, productId, updatedQuantity);
-}
+// const updateCartItemQuantity = async (userId, productId, updatedQuantity) => {
+//     await cartDataAccess.updateCartItemQuantity(cartItem=null, userId, productId, updatedQuantity);
+// }
+
+
 
 const removeEntryFromCart = async (userId, productId) => {
     await cartDataAccess.removeEntryFromCart(userId, productId);
 }
 
 module.exports =    {
+                        cartCounter,
                         retrieveAllCarts,
                         retrieveUserCartItems,
                         deleteCart,
                         addToCart,
-                        updateCartItemQuantity,
+                        // updateCartItemQuantity,
                         removeEntryFromCart
                     }

@@ -13,6 +13,8 @@ const assignCartNumber = async () => {
     return cartNumber;
 }
 
+
+
 const assignCartDateTime = async () => {
 
     timeOfCart = new Date();
@@ -64,17 +66,17 @@ const deleteCart = async (userId) => {
     }
 }
 
-const createNewCartItem = async (cartId, userId, productId, productName, price, quantity, dateTime) => {
+const createNewCartItem = async (payload) => {
     try{
 
         const newCartItem = new Cart_Item({
-            'cart_id': cartId,
-            'user_id': userId,
-            'product_id': productId,
-            'product_name': productName,
-            'price': price,
-            'quantity': quantity,
-            'date_time': dateTime
+            'cart_id': payload.cartId,
+            'user_id': payload.userId,
+            'product_id': payload.productId,
+            'product_name': payload.productName,
+            'price': payload.price,
+            'quantity': payload.quantity,
+            'date_time': Date.Now()
         })
         await newCartItem.save();
         return newCartItem;
