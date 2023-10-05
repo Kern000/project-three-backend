@@ -4,4 +4,8 @@ const postNewUserProduct = async (payload) => {
     await userDataAccess.addUserProductListing(payload);
 }
 
-module.exports = { postNewUserProduct };
+const updateUserProduct = async (payload) => {
+    await userDataAccess.updateUserProductListing(payload);
+}
+
+module.exports = { postNewUserProduct, updateUserProduct };

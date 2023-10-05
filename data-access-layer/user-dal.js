@@ -1,5 +1,5 @@
 const { default: knex } = require('knex');
-const { User, Product, Genres_Products } = require('../models');
+const { User, Product } = require('../models');
 
 const retrieveAllUsers = async () => {
     console.log('retrieve all users hit')
@@ -44,7 +44,15 @@ const addUserProductListing = async (payload) => {
         product.set('chapter_content', payload.chapterContent)
         product.set('user_id', payload.userId)
 
-        const productId = payload.userId
+        try{
+            await product.save();
+            console.log('success save product', product.toJSON())
+        } catch (error) {
+            console.log('fail to save products', error)
+        }
+
+        const productId = product.get('id');
+        console.log('fetched productId here', productId);
         const genreIds = payload.genreId;
 
         const insertData = genreIds.map(genreId => ({
@@ -56,16 +64,10 @@ const addUserProductListing = async (payload) => {
         console.log('insertData here', insertData)
         
         try{
-            await product.save();
-            console.log('success save product', product.toJSON())
-            try{
-                await product.genres().attach(insertData);
-                console.log('success saving genres')
-            } catch (error) {
-                console.log('Fail to save genres', error)
-            }
+            await product.genres().attach(insertData);
+            console.log('success saving genres')
         } catch (error) {
-            console.log('failed to attach genres', error)
+            console.log('Fail to save genres', error)
         }
 
     } catch (error) {
@@ -73,6 +75,66 @@ const addUserProductListing = async (payload) => {
     }
 }
 
+const updateUserProductListing = async (payload) => {
 
-module.exports = {retrieveAllUsers,findUserById, addUserProductListing};
+    console.log('route hit for addUserProduct, payload here', payload)
+
+    const productFoundById = await Product.where({
+        'id': payload.productId
+    }).fetch({
+        require:true,
+        withRelated: [  'post_category', 
+                        'genres',
+        ]
+    })
+
+    try{
+        productFoundById.set('name', payload.name);
+        productFoundById.set('price', payload.price);
+        productFoundById.set('description', payload.description);
+        productFoundById.set('image_url', payload.imageUrl);
+        productFoundById.set('thumbnail_url', payload.thumbnailUrl);
+        productFoundById.set('stock', payload.stock);
+        productFoundById.set('post_category_id', payload.postCategoryId)
+        productFoundById.set('chapter_content', payload.chapterContent)
+
+        const productId = payload.productId;
+        const genreIds = payload.genreId;
+
+        const insertData = genreIds.map(genreId => ({
+            "product_id": parseInt(productId),
+            "genre_id": parseInt(genreId)
+        })
+        )
+
+        const dataToPluck = parseInt(productId)
+
+        console.log('insertData here', insertData)
+        
+        try{
+            await productFoundById.save();
+            console.log('success save product', productFoundById.toJSON())
+            try{
+                console.log('updating genres after saving product')
+                await productFoundById.genres().detach();
+
+                console.log('successful detach genres from M:n r/s')
+
+                await productFoundById.genres().attach(insertData);
+                console.log('success updating genres')
+            } catch (error) {
+                console.log('Fail to save genres', error)
+            }
+        } catch (error) {
+            console.log('failed to save update on product', error)
+        }
+
+    } catch (error) {
+        console.error('error updating product listing', error)
+    }
+}
+
+
+
+module.exports = {retrieveAllUsers,findUserById, addUserProductListing, updateUserProductListing};
 

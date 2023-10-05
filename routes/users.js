@@ -6,10 +6,10 @@ const jwt = require('jsonwebtoken');
 
 const { User } = require('../models');
 
-const {findProductsByUserId} = require('../service-layer/products-service');
+const {findProductsByUserId, findProductById} = require('../service-layer/products-service');
 const {retrieveOrderByUserId} = require('../service-layer/order-service');
 const {retrieveUserCartItems} = require('../service-layer/cart-service');
-const {postNewUserProduct} = require('../service-layer/user-service');
+const {postNewUserProduct, updateUserProduct} = require('../service-layer/user-service');
 
 const { checkUserAuthenticationWithJWT } = require('../middleware');
 const session = require('express-session');
@@ -128,8 +128,6 @@ router.get('/dashboard/:userId', [checkUserAuthenticationWithJWT], async(req, re
 
             let userProducts = await findProductsByUserId(req.params.userId)
 
-            console.log('route received the following from DAL', userProducts)
-
             if (userProducts.length > 0){
 
                 res.json({"products":userProducts.toJSON()})
@@ -162,6 +160,76 @@ router.post('/add-product/:userId', [checkUserAuthenticationWithJWT], async(req,
         res.status(403).send('user not authorized for this action')
     }
 })
+
+router.get('/:productId/products', [checkUserAuthenticationWithJWT], async(req,res)=>{
+   
+    console.log("user single product route hit, req.query here =>", req.query.userId)
+    console.log("req.user.id", req.user.id)
+
+    let userId = parseInt(req.query.userId)
+
+    if (req.user.id === userId){
+
+        console.log('passed authorization check');
+
+        const productId = req.params.productId
+        console.log('product Id here =>', productId)
+
+        let product = await findProductById(productId)
+
+        res.json({'product': product.toJSON()});
+
+    } else {
+        res.status(401).send("User not authorized to view page")
+    }
+})
+
+router.get('/update/:productId', [checkUserAuthenticationWithJWT], async(req,res)=>{
+
+    console.log('update get route hit', req.query.userId, "req.user.id =>", req.user.id)
+
+    let userId = parseInt(req.query.userId);
+
+    if (req.user.id === userId){
+
+        const productId = req.params.productId;
+
+        try{
+            const product = await findProductById(productId);
+            res.json({"product": product.toJSON()})
+
+        } catch (error){
+            res.status(400).send('product not found')
+        }
+    } else {
+        res.status(401).send('user not authorized to view')
+    }
+}
+)
+
+router.post('/:productId/update', [checkUserAuthenticationWithJWT], async(req,res)=>{
+
+    console.log("user single update route hit, req.query here =>", req.query.userId)
+    console.log("req.user.id at update", req.user.id)
+
+    let userId = parseInt(req.query.userId)
+
+    if (req.user.id === userId){
+        let payload = req.body
+
+        console.log('update route authorization achieved')
+        try {
+            await updateUserProduct(payload)
+            console.log('successful update here')
+        } catch (error){
+            res.status(400).send('Bad request from user')
+        }
+        res.status(200).send("Product update success");
+    } else {
+        res.status(401).send('user not authorized to view page')
+    }
+})
+
 
 
 

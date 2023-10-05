@@ -124,7 +124,6 @@ const findProductsByUserId = async (userId) => {
                 ]
             })
         
-        console.log('This is products search by userId DAL =>', productsFoundByUserId)
         return productsFoundByUserId;
 
     } catch (error){
