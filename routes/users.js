@@ -9,10 +9,9 @@ const { User } = require('../models');
 const {findProductsByUserId} = require('../service-layer/products-service');
 const {retrieveOrderByUserId} = require('../service-layer/order-service');
 const {retrieveUserCartItems} = require('../service-layer/cart-service');
+const {postNewUserProduct} = require('../service-layer/user-service');
 
-const {
-    checkUserAuthenticationWithJWT
-} = require('../middleware');
+const { checkUserAuthenticationWithJWT } = require('../middleware');
 const session = require('express-session');
 
 const generateJWT = (user, tokenSecret, expirationTime) => {
@@ -144,10 +143,25 @@ router.get('/dashboard/:userId', [checkUserAuthenticationWithJWT], async(req, re
             res.status(500).json({error: "Failed to fetch products"})
         }
     } else {
-        res.status(403).json({error: 'unauthorized user'})
+        res.status(401).json({error: 'unauthorized user'})
     }
 })
 
+router.post('/add-product/:userId', [checkUserAuthenticationWithJWT], async(req,res)=>{
+
+    if (req.user.id == req.params.userId){
+
+        try{
+            console.log('Req.body is here', req.body)
+            await postNewUserProduct(req.body);
+            res.status(200).send('successfully added product')
+        } catch (error) {
+            res.status(400).send('Failed to post new product')            
+        }
+    } else {
+        res.status(403).send('user not authorized for this action')
+    }
+})
 
 
 

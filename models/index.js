@@ -74,6 +74,10 @@ const Super_Admin = bookshelf.model('Super_Admin', {
     }
 })
 
+const Genres_Products = bookshelf.model('Genres_Products',{
+    tableName:'genres_products'
+})
+
 const BlackListedToken = bookshelf.model("BlackListedToken", {
     tableName: 'blacklisted_tokens'
 })
@@ -105,5 +109,6 @@ module.exports = {
                     BlackListedToken,
                     Session,
                     Cart_Counter,
-                    Order_Counter
+                    Order_Counter,
+                    Genres_Products
                 }
