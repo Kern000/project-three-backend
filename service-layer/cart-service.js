@@ -4,8 +4,9 @@ const retrieveAllCarts = async () => {
     await cartDataAccess.retrieveAllCarts();
 }
 
-const retrieveUserCartItems = async (userId) => {
-    await cartDataAccess.retrieveUserCartItems(userId);
+const retrieveUserCartItems = async (userId, cartId) => {
+    const cartItems = await cartDataAccess.retrieveUserCartItems(userId, cartId);
+    return cartItems;
 }
 
 const deleteCart = async (userId) => {
@@ -18,28 +19,30 @@ const cartCounter = async () => {
 }
 
 
+const addToCart = async (payload) => {
 
-
-const addToCart = async (userId, productId, quantity) => {
-
-    const cartItem = await cartDataAccess.fetchCartItemByUserAndProduct(userId, productId);
+    const cartItem = await cartDataAccess.fetchCartItemByUserAndProduct(payload.user_id, payload.cart_id, payload.product_id);
 
     if (cartItem){
         const updatedQuantity = cartItem.get('quantity')+1;
-        await cartDataAccess.updateCartItemQuantity(cartItem, userId, productId, updatedQuantity)
+        const newPayload = payload
+        newPayload.quantity = updatedQuantity
+        await cartDataAccess.updateCartItemQuantity(newPayload)
+
     } else {
-        return await cartDataAccess.createNewCartItem(userId, productId, quantity)
+        console.log('alternate path hit at service layer addToCart')
+        return await cartDataAccess.createNewCartItem(payload)
     }
 }
 
-// const updateCartItemQuantity = async (userId, productId, updatedQuantity) => {
-//     await cartDataAccess.updateCartItemQuantity(cartItem=null, userId, productId, updatedQuantity);
-// }
+const updateCartItemQuantity = async (payload) => {
+    await cartDataAccess.updateCartItemQuantity(payload);
+}
 
 
 
-const removeEntryFromCart = async (userId, productId) => {
-    await cartDataAccess.removeEntryFromCart(userId, productId);
+const removeEntryFromCart = async (userId, cartId, productId) => {
+    await cartDataAccess.removeEntryFromCart(userId, cartId, productId);
 }
 
 module.exports =    {
@@ -48,6 +51,6 @@ module.exports =    {
                         retrieveUserCartItems,
                         deleteCart,
                         addToCart,
-                        // updateCartItemQuantity,
+                        updateCartItemQuantity,
                         removeEntryFromCart
                     }
