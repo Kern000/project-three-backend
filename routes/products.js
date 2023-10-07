@@ -11,7 +11,6 @@ const { retrieveAllProducts,
 router.get('/', async(req,res)=>{
 
     let products = await retrieveAllProducts();
-    console.log('This is what is fetched', products)
     res.json({'products': products.toJSON()})
 })
 

@@ -110,7 +110,7 @@ const createProductForm = (post_category=[], genres=[]) => {
             validators:[
                 validators.minlength(0),
                 validators.required(),
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!'"?@()]+$/)
             ]
         }),
         'price': fields.number({
@@ -127,7 +127,7 @@ const createProductForm = (post_category=[], genres=[]) => {
             cssClasses: {
                 label: ['form-label']
             },
-            validators:[validators.regexp(/^[a-zA-Z0-9._%+ -()!@]+$/)]
+            validators:[validators.regexp(/^[a-zA-Z0-9._%+ -()!'"?@]+$/)]
         }),
         'stock': fields.number({
             required: true,
@@ -168,7 +168,7 @@ const createProductForm = (post_category=[], genres=[]) => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -()!@\s]+$/),
+                validators.regexp(/^[a-zA-Z0-9._%+ -()!'"?@\s]+$/),
                 validators.maxlength(100000)
             ]
         }),
@@ -192,7 +192,7 @@ const createSearchForm = (post_category=[], genres=[]) => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!'"?@()]+$/)
             ]
         }),
         'user': fields.string({
@@ -203,7 +203,7 @@ const createSearchForm = (post_category=[], genres=[]) => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!'"?@]+$/)
             ]
         }),
         'min_price': fields.number({
@@ -256,7 +256,7 @@ const createUserSearchForm = () => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!'"?@()]+$/)
             ]
         }),
         'name': fields.string({
@@ -267,7 +267,7 @@ const createUserSearchForm = () => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!'"?@()]+$/)
             ]
         }),
         'email': fields.string({
@@ -278,7 +278,7 @@ const createUserSearchForm = () => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!'"?@]+$/)
             ]
         })
     })
@@ -294,7 +294,7 @@ const createUserProductsSearchForm = (post_category=[], genres=[]) => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!'"?@()]+$/)
             ]
         }),
         'min_price': fields.number({
@@ -347,7 +347,7 @@ const createCartSearchForm = () => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!'"?@()]+$/)
             ]
         }),
         'user_id': fields.string({
@@ -358,7 +358,7 @@ const createCartSearchForm = () => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!'"?@()]+$/)
             ]
         })
     })
@@ -374,7 +374,7 @@ const createOrderSearchForm = () => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!'"?@()]+$/)
             ]
         }),
         'user_id': fields.string({
@@ -385,7 +385,7 @@ const createOrderSearchForm = () => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!'"?@()]+$/)
             ]
         }),
         'product_id': fields.string({
@@ -396,7 +396,7 @@ const createOrderSearchForm = () => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!'"?@()]+$/)
             ]
         }),
         'seller_id': fields.string({
@@ -407,7 +407,7 @@ const createOrderSearchForm = () => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!'"?@()]+$/)
             ]
         }),
         'fulfilment': fields.string({
@@ -418,7 +418,7 @@ const createOrderSearchForm = () => {
                 label: ['form-label']
             },
             validators:[
-                validators.regexp(/^[a-zA-Z0-9._%+ -!@()]+$/)
+                validators.regexp(/^[a-zA-Z0-9._%+ -!'"?@()]+$/)
             ]
         })
     })

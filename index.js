@@ -27,7 +27,6 @@ wax.setLayoutPath("./views/layout")
 
 app.use(cors());
 
-app.use(express.json());
 
 // Enable forms in req
 app.use('/admin', express.urlencoded({ extended: false }));
@@ -47,6 +46,7 @@ const csrfInstance = csurf();
 
 app.use(function(req, res, next) {
     if (req.url === "/checkout/process-payment") {
+        console.log('checkout fulfill exception')
         return next();
     }
     
@@ -87,7 +87,7 @@ app.use(function(req,res,next){
     res.locals.success_messages = successMessages;
     res.locals.error_messages = errorMessages;
     next();
-  })
+})
 
 
 // Enable user info for template
@@ -101,17 +101,7 @@ app.use(function(req, res, next){
     next();
 })
 
-// Logics
 
-// app.get('/get-csrf', (req,res) => {
-//     req.session.csrf = req.csrfToken();
-//     console.log("session here", req.session.csrf)
-//     res.json({"csrf":req.session.csrf})
-// })
-
-// Import routes and logics, define higher level route category
-
-//
 const landingRoutes = require('./routes/landing');
 const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/users');
@@ -120,18 +110,20 @@ const cloudinaryRoutes = require('./routes/cloudinary');
 const searchRoutes = require('./routes/search')
 const checkoutRoutes = require('./routes/checkout');
 const cartRoutes = require('./routes/cart');
+const orderRoutes = require('./routes/order')
 
 async function main(){
 
     app.use('/admin', superAdminRoutes);
-
     app.use('/', landingRoutes);
-    app.use('/products', productRoutes);
-    app.use('/users', userRoutes);
-    app.use('/search', searchRoutes)
-    app.use('/cloudinary', cloudinaryRoutes);
-    app.use('/cart', cartRoutes);
+    app.use('/products', express.json(), productRoutes);
+    app.use('/users', express.json(), userRoutes);
+    app.use('/search', express.json(), searchRoutes)
+    app.use('/cloudinary', express.json(), cloudinaryRoutes);
+    app.use('/cart', express.json(), cartRoutes);
+    app.use('/orders', express.json(), orderRoutes);
     app.use('/checkout', checkoutRoutes);
+
 }
 
 main();

@@ -1,5 +1,10 @@
 const orderDataAccess = require('../data-access-layer/order-dal');
 
+const assignOrderNumber = async()=>{
+    const orderId = await orderDataAccess.assignOrderNumber();
+    return orderId;
+}
+
 const retrieveAllOrders = async () => {
     await orderDataAccess.retrieveAllOrders();
 }
@@ -32,12 +37,18 @@ const removeOrderItem = async (userId, productId) => {
     await orderDataAccess.removeOrderItem(userId, productId);
 }
 
+const createNewOrder = async (payload) => {
+    await orderDataAccess.createNewOrder(payload);
+}
+
 module.exports =    {
                         retrieveAllOrders,
                         retrieveOrderByUserId,
                         deleteOrder,
                         addToOrder,
                         updateOrderItemQuantity,
-                        removeOrderItem
+                        removeOrderItem,
+                        assignOrderNumber,
+                        createNewOrder
 }
 

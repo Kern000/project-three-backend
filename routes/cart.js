@@ -17,7 +17,6 @@ router.get('/', [checkUserAuthenticationWithJWT], async(req,res)=>{
         console.log('user passed cart jwt authorization');     
         const itemsInCart = await cartService.retrieveUserCartItems(userId, cartId);
 
-        console.log('passed DAL for retrieving cart', itemsInCart)
         if (itemsInCart.length>0){
             res.status(201).json({"itemsInCart": itemsInCart.toJSON()});
         } else {
@@ -118,21 +117,6 @@ router.post('/update-qty', [checkUserAuthenticationWithJWT], async(req,res)=>{
     }
 })
 
-
-
-
-
-
-
-
-router.post('/:product_id/delete', async(req,res)=>{
-    await cartService.removeEntryFromCart(
-        req.session.user.id,
-        req.params.product_id
-    )
-    res.status(202);
-    res.json({"message": "Item removed from cart"})
-})
 
 module.exports = router;
 

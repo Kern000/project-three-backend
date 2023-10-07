@@ -13,8 +13,6 @@ const assignCartNumber = async () => {
     const cartTarget = cartNumberFetch.at(0)
     const cartNumber = cartTarget.get('id');
     
-    const newInstance = await Cart_Counter.collection().where({'id':cartNumber})   
-
     console.log('cartNumber', cartNumber)
 
     const newCartNumber = cartNumber + 1;
@@ -48,7 +46,6 @@ const retrieveUserCartItems = async (userId, cartId) => {
         let userCartItems = await Cart_Item.collection().where({'user_id': userId, 'cart_id': cartId}).fetch({
             'require':false
         })                      
-        console.log('DAL retrieveUserCartItems =>', userCartItems)  
         return userCartItems;
     } catch (error){
         console.error('error retrieving cart items', error)
@@ -123,7 +120,7 @@ const createNewCartItem = async (payload) => {
         newCartItem.set('price', payload.price);
         newCartItem.set('quantity', payload.quantity);
         newCartItem.set('date_time', currentDate);
-        newCartItem.set('thumbnail_url', payload.thumbnail_url)
+        newCartItem.set('thumbnail_url', payload.thumbnail_url);
 
         await newCartItem.save();
 

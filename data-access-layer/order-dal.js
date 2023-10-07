@@ -1,26 +1,31 @@
 const { knex } = require('../bookshelf');
-const { Order_Item }= require('../models');
+const { Order_Item, Order_Counter }= require('../models');
 
 const assignOrderNumber = async () => {
     
-    const orderNumber = await Order_Counter.fetch({
+    console.log('order number dal hit')
+
+    const orderNumberFetch = await Order_Counter.collection().fetch({
         'require': true
     });
 
-    const newOrderNumber = orderNumber.get('id') + 1;
+    const orderTarget = orderNumberFetch.at(0)
+    const orderNumber = orderTarget.get('id');
+    
+    console.log('orderNumber', orderNumber)
 
-    await Order_Counter.where({id:orderNumber}).save({ id: newOrderNumber });
+    const newOrderNumber = orderNumber + 1;
+    console.log('new orderNumber', newOrderNumber)
+
+    try{
+        await knex('order_counting').where({'id': orderNumber}).update({'id': newOrderNumber})
+        console.log('assign order number success')
+    } catch (error){
+        console.log('fail to save orderCounter')
+    }
 
     return orderNumber;
 }
-
-const assignOrderDateTime = async () => {
-
-    timeOfOrder = new Date();
-
-    return timeOfOrder;
-}
-
 
 const retrieveAllOrders = async () => {
     try{
@@ -30,6 +35,31 @@ const retrieveAllOrders = async () => {
         return allOrders;
     } catch (error) {
         console.error('failed to retrieve all orders', error);
+    }
+}
+
+const createNewOrder = async (payload) => {
+
+    const currentDate = new Date();
+
+    console.log('DAL payload from route', payload)
+
+    try{
+        for (let item of payload){
+            let orderItem = new Order_Item();
+            orderItem.set('order_id', item.order_id);
+            orderItem.set('cart_id', item.cart_id);
+            orderItem.set('user_id', item.user_id);
+            orderItem.set('product_id', item.product_id);
+            orderItem.set('product_name', item.product_name);
+            orderItem.set('price', item.price);
+            orderItem.set('quantity', item.quantity);
+            orderItem.set('date_time', currentDate);
+            orderItem.set('fulfilled', 'No');
+            await orderItem.save()
+        }
+    } catch (error){
+        console.log('Fail create new order entry at DAL', error)
     }
 }
 
@@ -82,8 +112,6 @@ const retrieveOrderItemByUserAndProduct = async (userId, orderId, productId) => 
         console.error('error fetching order item by user id, order id, and product id', error)
     }
 }
-
-
 
 const retrieveOrderItemByOrderIdAndProduct = async (orderId, productId) => {
     try{
@@ -155,7 +183,6 @@ const removeOrderItem = async (orderId, productId) => {
 }
 
 module.exports =    {
-                        assignOrderDateTime,
                         assignOrderNumber,
                         retrieveAllOrders,
                         retrieveOrderByUserId,
@@ -165,5 +192,6 @@ module.exports =    {
                         retrieveOrderItemByOrderIdAndProduct,
                         updateOrderItemQuantity,
                         updateOrderFulfilment,
-                        removeOrderItem
+                        removeOrderItem,
+                        createNewOrder
                     }
