@@ -182,6 +182,22 @@ const removeOrderItem = async (orderId, productId) => {
     }
 }
 
+const retrieveOrdersByUserIdAndPaidStatus = async (userId) => {
+    try{
+        const foundOrders = await Order_Item.collection().where({
+            'user_id': userId,
+            'paid': 'Yes'
+        }).fetch({
+            require: false
+        })
+        return foundOrders;
+    } catch (error){
+        console.error('error fetching orders by user and paid status', error)
+    }
+}
+
+
+
 module.exports =    {
                         assignOrderNumber,
                         retrieveAllOrders,
@@ -193,5 +209,6 @@ module.exports =    {
                         updateOrderItemQuantity,
                         updateOrderFulfilment,
                         removeOrderItem,
-                        createNewOrder
+                        createNewOrder,
+                        retrieveOrdersByUserIdAndPaidStatus
                     }

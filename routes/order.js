@@ -5,11 +5,13 @@ const { checkUserAuthenticationWithJWT } = require('../middleware');
 
 router.get('/', [checkUserAuthenticationWithJWT], async(req,res)=>{
 
-    if (req.user.id === req.query.id){
+    let userId = parseInt(req.query.userId)
+
+    if (req.user.id === userId){
 
         try{
-            let allUserOrders = await orderService.retrieveOrderByUserId(req.user.id)
-            res.status(200).json(allUserOrders.toJSON())
+            let allUserOrders = await orderService.retrieveOrdersByUserIdAndPaidStatus(req.user.id)
+            res.status(200).json({'userOrders': allUserOrders.toJSON()})
         } catch (error) {
             res.status(204).send('No orders fetched')
         }

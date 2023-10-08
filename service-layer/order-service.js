@@ -41,6 +41,12 @@ const createNewOrder = async (payload) => {
     await orderDataAccess.createNewOrder(payload);
 }
 
+const retrieveOrdersByUserIdAndPaidStatus = async (userId) => {
+    let retrievedOrders = await orderDataAccess.retrieveOrdersByUserIdAndPaidStatus(userId)
+    return retrievedOrders;
+}
+
+
 module.exports =    {
                         retrieveAllOrders,
                         retrieveOrderByUserId,
@@ -49,6 +55,7 @@ module.exports =    {
                         updateOrderItemQuantity,
                         removeOrderItem,
                         assignOrderNumber,
-                        createNewOrder
+                        createNewOrder,
+                        retrieveOrdersByUserIdAndPaidStatus
 }
 

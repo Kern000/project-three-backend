@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser')
+const { Order_Item } = require('../models');
+const { knex } = require('../bookshelf');
 
 const Stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); //for client side operation
 
@@ -53,7 +55,16 @@ router.post('/process-payment', bodyParser.raw({type: 'application/json'}), asyn
         console.log('stripe session success =>', stripeSession);
         let orderId = stripeSession.client_reference_id
         console.log('order id passing through stripe', orderId)
+        
+        try{
+            let paidProducts = await Order_Item.where({order_id: orderId}).fetchAll();
+            console.log('paid items to update =', paidProducts.toJSON());
 
+            await knex('order_items').where({'order_id': orderId}).update({'paid': 'Yes'})
+            console.log('paid items updated');
+        } catch (error){
+            console.log('error updating paid status', error);
+        }
     }
 })
 
