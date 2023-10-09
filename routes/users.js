@@ -39,16 +39,15 @@ router.post('/login', async(req, res)=>{
             require: false
         });
 
-        console.log("this has been found", foundUser.toJSON())
-
-        let userId = foundUser.get('id');
-        let userName = foundUser.get('name');
-
-        console.log('userId route =>', userId)
-        console.log('userName route =>', userName)
-
         try {
             if (foundUser){
+
+                let userId = foundUser.get('id');
+                let userName = foundUser.get('name');
+        
+                console.log('userId route =>', userId)
+                console.log('userName route =>', userName)
+        
                 const accessToken = generateJWT(foundUser.toJSON(), process.env.ACCESS_TOKEN_SECRET, "3hr");
                 const refreshToken = generateJWT(foundUser.toJSON(), process.env.REFRESH_TOKEN_SECRET, "7d");
                 
@@ -175,10 +174,13 @@ router.get('/:productId/products', [checkUserAuthenticationWithJWT], async(req,r
         const productId = req.params.productId
         console.log('product Id here =>', productId)
 
-        let product = await findProductById(productId)
+        try{
+            let product = await findProductById(productId)
 
-        res.json({'product': product.toJSON()});
-
+            res.json({'product': product.toJSON()});
+        } catch (error){
+            res.status(204).send("Error verifying user, please try again")
+        }
     } else {
         res.status(401).send("User not authorized to view page")
     }
