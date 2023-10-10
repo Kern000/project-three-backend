@@ -346,6 +346,7 @@ router.post('/add-product', [checkSessionAuthentication, checkAuthenticationWith
 
             console.log(product)
             if (form.data.genres){
+                console.log('form genres here', form.data.genres)
                 await product.genres().attach(form.data.genres.split(','));
             }
             req.flash("success", "New product created");
