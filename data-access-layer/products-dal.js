@@ -142,7 +142,7 @@ const searchProductsBySearchForm = async (payload)=>{
     try{
         if (searchCriteria.name) {
             console.log('search form name hit', searchCriteria.name)
-            query.where('name', 'like', '%' + searchCriteria.name + '%')
+            query.where('name', 'ilike', '%' + searchCriteria.name + '%')
         }
 
         if (searchCriteria.minPrice) {
