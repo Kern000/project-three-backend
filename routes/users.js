@@ -97,15 +97,14 @@ router.post('/register', async(req, res)=>{
 
     } else {
         const newUser = new User();
-        console.log('creating new User')
+        console.log('creating new User, payload here=>', req.body)
         try {
-            newUser.set({
-                name: req.body.name,
-                email: req.body.email,
-                password: getHashedPassword(req.body.password),
-                secret: req.body.secret
-            })
+            newUser.set('name', req.body.name)
+            newUser.set('email', req.body.email)
+            newUser.set('password', getHashedPassword(req.body.password))
+            newUser.set('secret', req.body.secret)
             await newUser.save();
+            console.log('new user saved')
             res.sendStatus(202).send('registration success');
         } catch (error){
             res.status(500).send('server is down')
