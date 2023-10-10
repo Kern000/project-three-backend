@@ -128,7 +128,7 @@ async function main(){
 
 main();
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000 || 10000;
 
 app.listen(port, ()=>{
     console.log("Server started, listening at port ", port)
