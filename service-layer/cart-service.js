@@ -5,7 +5,7 @@ const retrieveAllCarts = async () => {
 }
 
 const retrieveUserCartItems = async (cartId) => {
-    const cartItems = await cartDataAccess.retrieveSingleCartItems(userId, cartId);
+    const cartItems = await cartDataAccess.retrieveSingleCartItems(cartId);
     return cartItems;
 }
 

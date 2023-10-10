@@ -17,7 +17,7 @@ router.get('/', [checkUserAuthenticationWithJWT], async(req,res)=>{
         console.log('user passed cart jwt authorization');     
 
         try {
-            const itemsInCart = await cartService.retrieveUserCartItems(userId, cartId);
+            const itemsInCart = await cartService.retrieveUserCartItems(cartId);
        
             if (itemsInCart.length>0){
                 res.status(201).json({"itemsInCart": itemsInCart.toJSON()});
