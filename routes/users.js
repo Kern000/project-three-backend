@@ -82,35 +82,30 @@ router.post('/login', async(req, res)=>{
 
 router.post('/register', async(req, res)=>{
 
-    try{
-        let foundUser = await User.where({
-            'email': req.body.email,
-            'password': getHashedPassword(req.body.password)
-            }).fetch({
-                require: false
-            });
+    let foundUser = await User.where({
+    'email': req.body.email,
+    'password': getHashedPassword(req.body.password)
+    }).fetch({
+        require: false
+    });
 
-        try{   
-            if (foundUser){
-                res.status(400).send("Email already in use");    
-            } else {
-                const newUser = new User();
-                newUser.set({
-                    name: req.body.name,
-                    email: req.body.email,
-                    password: getHashedPassword(req.body.password),
-                    secret: req.body.secret
-                })
-                await newUser.save();       
-                res.sendStatus(202);
-            }
-        } catch (error) {
-            console.error('fail to register user to db', error)
-            res.sendStatus(500)
+    if (foundUser){
+        res.status(400).send("Email already in use");    
+
+    } else {
+        const newUser = new User();
+        try {
+            newUser.set({
+                name: req.body.name,
+                email: req.body.email,
+                password: getHashedPassword(req.body.password),
+                secret: req.body.secret
+            })
+            await newUser.save();       
+            res.sendStatus(202);
+        } catch (error){
+            res.status(500).send('server is down')
         }
-    } catch {
-        console.error('Internal error', error);
-        res.sendStatus(500)
     }
 })
 
