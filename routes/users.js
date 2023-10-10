@@ -82,6 +82,7 @@ router.post('/login', async(req, res)=>{
 
 router.post('/register', async(req, res)=>{
 
+    console.log('register route hit')
     let foundUser = await User.where({
     'email': req.body.email,
     'password': getHashedPassword(req.body.password)
@@ -89,11 +90,14 @@ router.post('/register', async(req, res)=>{
         require: false
     });
 
+    console.log('is there foundUser', foundUser)
+
     if (foundUser){
         res.status(400).send("Email already in use");    
 
     } else {
         const newUser = new User();
+        console.log('creating new User')
         try {
             newUser.set({
                 name: req.body.name,
@@ -101,8 +105,8 @@ router.post('/register', async(req, res)=>{
                 password: getHashedPassword(req.body.password),
                 secret: req.body.secret
             })
-            await newUser.save();       
-            res.sendStatus(202);
+            await newUser.save();
+            res.sendStatus(202).send('registration success');
         } catch (error){
             res.status(500).send('server is down')
         }
