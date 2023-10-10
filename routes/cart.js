@@ -8,7 +8,7 @@ router.get('/', [checkUserAuthenticationWithJWT], async(req,res)=>{
     console.log('route hit for user cart get')
 
     let userId = parseInt(req.query.userId);
-    let cartId = req.query.cartId;
+    let cartId = parseInt(req.query.cartId);
     console.log('userId here', userId);
     console.log('cartId here', cartId);
     console.log('user Id here', req.user.id);
