@@ -77,7 +77,7 @@ const addProductListing = async (productForm) => {
         product.set('stock', productForm.data.stock);
         product.set('post_category_id', productForm.data.post_category_id)
         product.set('chapter_content', productForm.data.chapter_content)
-        product.set('user_id', 1)
+        product.set('user_id', 5)
 
         await product.save();
         return product;
