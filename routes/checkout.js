@@ -21,7 +21,7 @@ router.post("/", express.json(), async(req,res)=>{
         payment_method_types: ['card'],
         mode: 'payment',
         line_items: cartBeingCheckedOut,
-        success_url: "http://localhost:3000/paymentsuccess",
+        success_url: "https://6524cc7fd921247e7e8d298a--singular-jalebi-389fbc.netlify.app/paymentsuccess",
         client_reference_id: order_id
     }
 
