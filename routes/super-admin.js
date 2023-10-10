@@ -338,6 +338,7 @@ router.post('/add-product', [checkSessionAuthentication, checkAuthenticationWith
     const allGenres = await retrieveAllGenres();
 
     const form = createProductForm(allPostCategories, allGenres);
+    console.log('super admin product form here', form);
 
     form.handle(req, {
         "success": async (form) =>{
@@ -597,7 +598,7 @@ router.get('/carts', [checkSessionAuthentication, checkAuthenticationWithJWT], a
 
 router.get('/carts/:cartId/delete-cart', [checkSessionAuthentication, checkAuthenticationWithJWT], async (req,res)=>{
     
-    let cartId = req.params.cartId;
+    let cartId = parseInt(req.params.cartId);
     
     const cartItems = await retrieveSingleCartItems(cartId);
     console.log(cartItems.toJSON())

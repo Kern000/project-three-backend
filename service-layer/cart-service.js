@@ -4,13 +4,13 @@ const retrieveAllCarts = async () => {
     await cartDataAccess.retrieveAllCarts();
 }
 
-const retrieveUserCartItems = async (userId, cartId) => {
-    const cartItems = await cartDataAccess.retrieveUserCartItems(userId, cartId);
+const retrieveUserCartItems = async (cartId) => {
+    const cartItems = await cartDataAccess.retrieveSingleCartItems(userId, cartId);
     return cartItems;
 }
 
-const deleteCart = async (userId) => {
-    await cartDataAccess.deleteCart(userId);
+const deleteCart = async (cartId) => {
+    await cartDataAccess.deleteCart(cartId);
 }
 
 const cartCounter = async () => {

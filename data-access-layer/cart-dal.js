@@ -39,19 +39,6 @@ const retrieveAllCarts = async () => {
     }
 }
 
-const retrieveUserCartItems = async (userId, cartId) => {
-
-    console.log('dal retrieveUserCartItems hit')
-    try{
-        let userCartItems = await Cart_Item.collection().where({'user_id': userId, 'cart_id': cartId}).fetch({
-            'require':false
-        })                      
-        return userCartItems;
-    } catch (error){
-        console.error('error retrieving cart items', error)
-    }
-}
-
 const retrieveSingleCartItems = async (cartId) => {
 
     try{
@@ -64,9 +51,9 @@ const retrieveSingleCartItems = async (cartId) => {
     }
 }
 
-const deleteCart = async (userId) => {
+const deleteCart = async (cartId) => {
     try{
-        const userCart = await retrieveUserCartItems(userId);
+        const userCart = await retrieveSingleCartItems(cartId);
         await userCart.destroy();
     } catch (error) {
         console.error('fail to delete user cart', error)
@@ -151,7 +138,6 @@ const removeEntireCart = async (cartId) => {
 module.exports = {
                     assignCartNumber,
                     retrieveAllCarts,
-                    retrieveUserCartItems,
                     deleteCart,
                     createNewCartItem, 
                     fetchCartItemByUserAndProduct, 
