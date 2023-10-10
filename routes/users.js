@@ -105,7 +105,7 @@ router.post('/register', async(req, res)=>{
             newUser.set('secret', req.body.secret)
             await newUser.save();
             console.log('new user saved')
-            res.sendStatus(202).send('registration success');
+            res.status(202).send('registration success');
         } catch (error){
             res.status(500).send('server is down')
         }
