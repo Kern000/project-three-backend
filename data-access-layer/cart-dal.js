@@ -44,8 +44,7 @@ const retrieveSingleCartItems = async (cartId) => {
     try{
         let cartItems = await Cart_Item.collection().where({'cart_id': cartId}).fetch({
             'require':false
-        })      
-        cartItems = cartItems.sort();    
+        })  
         return cartItems;
     } catch (error){
         console.error('error retrieving cart items', error)
