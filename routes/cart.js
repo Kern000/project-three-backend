@@ -15,12 +15,17 @@ router.get('/', [checkUserAuthenticationWithJWT], async(req,res)=>{
 
     if (req.user.id === userId){
         console.log('user passed cart jwt authorization');     
-        const itemsInCart = await cartService.retrieveUserCartItems(userId, cartId);
 
-        if (itemsInCart.length>0){
-            res.status(201).json({"itemsInCart": itemsInCart.toJSON()});
-        } else {
-            res.status(200).json({"itemsInCart": ''})
+        try {
+            const itemsInCart = await cartService.retrieveUserCartItems(userId, cartId);
+       
+            if (itemsInCart.length>0){
+                res.status(201).json({"itemsInCart": itemsInCart.toJSON()});
+            } else {
+                res.status(200).json({"itemsInCart": ''})
+            }
+        } catch (error) {
+            res.send(204).send('No items found in cart');
         }
     } else {
         res.status(401).send("Unauthorized, log in to view page");
