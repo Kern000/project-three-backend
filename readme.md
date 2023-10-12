@@ -75,7 +75,7 @@ POST Route <br />
 https://writers-base-backend.onrender.com/admin/login
 
 <h2> Routes below require admin login </h2>
-<h3> Admin fetch or search products from users and admin </h3>
+<h3> Admin fetch or search products of users and admin </h3>
 GET Route <br />
 https://<span></span>writers-base-backend.onrender.com/admin/products
 
