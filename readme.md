@@ -1,6 +1,6 @@
 <h2> Documentation of Backend for Writers' base marketplace project </h2>
 
-This is the backend repository for Writers' base frontend repo: <a href="https://github.com/Kern000/proj3-frontend"> Here </a> <br />
+This is the link to this repo's frontend repository for Writers' base: <a href="https://github.com/Kern000/proj3-frontend"> Here </a> <br />
 Live webpage of frontend is found: <a href="https://singular-jalebi-389fbc.netlify.app/#/"> Here </a> <br />
 
 <h4> Entity Relational Diagram </h4>
