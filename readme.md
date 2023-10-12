@@ -4,7 +4,7 @@ This is the backend repository for Writers' base frontend repo: <a href="https:/
 Live webpage of frontend is found: <a href="https://singular-jalebi-389fbc.netlify.app/#/"> Here </a> <br />
 
 <h4> Entity Relational Diagram </h4>
-<img src="./erd.png />
+<img src="./erd.png" alt="ERD" width="900"/>
 
 <h4> Database Details </h4>
 Relational Database was constructed using Bookshelf model with knex queries using mySql2, and later transitioned into Postgres. Relational Database presents a quick way to update multiple related tables in a single transaction.
