@@ -4,7 +4,7 @@ This is the backend repository for Writers' base frontend repo: <a href="https:/
 Live webpage of frontend is found: <a href="https://singular-jalebi-389fbc.netlify.app/#/"> Here </a> <br />
 
 <h4> Entity Relational Diagram </h4>
-<img src="./erd.png" alt="ERD" width="900"/>
+<img src="./ERD.png" alt="ERD" width="900"/>
 
 <h4> Database Details </h4>
 Relational Database was constructed using Bookshelf model with knex queries using mySql2, and later transitioned into Postgres. Relational Database presents a quick way to update multiple related tables in a single transaction.
@@ -42,7 +42,7 @@ https://singular-jalebi-389fbc.netlify.app/#/users/add-product/:userId
 GET Route <br />
 https://singular-jalebi-389fbc.netlify.app/#/users/:productId/products
 
-<h5> Cart </h5>
+<h4> Cart </h4>
 <h5> User fetch cart </h5>
 GET Route <br />
 https://singular-jalebi-389fbc.netlify.app/#/cart
@@ -55,7 +55,7 @@ https://singular-jalebi-389fbc.netlify.app/#/cart/:product_id/add
 POST Route <br />
 https://singular-jalebi-389fbc.netlify.app/#/cart/update-qty
 
-<h5> Checkout </h5>
+<h4> Checkout </h4>
 POST Route <br />
 https://singular-jalebi-389fbc.netlify.app/#/checkout
 
