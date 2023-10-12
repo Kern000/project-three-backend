@@ -26,11 +26,11 @@ GET Route <br />
 https://singular-jalebi-389fbc.netlify.app/#/
 
 <h3> User login </h3>
-POST Route <br />
+GET Route <br />
 https://singular-jalebi-389fbc.netlify.app/#/users/login
 
 <h3> User Registration </h3>
-POST Route <br />
+GET Route <br />
 https://singular-jalebi-389fbc.netlify.app/#/users/register
 
 <h2> All routes below have authentication and authorization required </h2>
