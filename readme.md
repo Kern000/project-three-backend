@@ -92,7 +92,7 @@ POST Route <br />
 https://<span></span>writers-base-backend.onrender.com/admin/orders/update-quantity
 
 <h2> Testing </h2>
-Testing is conducted on development frontend routes and localhost routes.
+Testing is conducted on development frontend routes and localhost routes. Routes are later tested on deployment and live website.
 
 <h2> Deployment </h2>
 Backend deployment is on render. Backend admin pages are also hosted on render.
