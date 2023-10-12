@@ -23,15 +23,15 @@ Many to Many Relationship <br />
 
 <h3> Landing Route displaying products </h3>
 GET Route <br />
-https://<span></span>singular-jalebi-389fbc.netlify.app/#/
+https://singular-jalebi-389fbc.netlify.app/#/
 
 <h3> User login </h3>
 GET Route <br />
-https://<span></span>singular-jalebi-389fbc.netlify.app/#/users/login
+https://singular-jalebi-389fbc.netlify.app/#/users/login
 
 <h3> User Registration </h3>
 GET Route <br />
-https://<span></span>singular-jalebi-389fbc.netlify.app/#/users/register
+https://singular-jalebi-389fbc.netlify.app/#/users/register
 
 <h2> All routes below have authentication and authorization required </h2>
 <h3> User add product </h3>
