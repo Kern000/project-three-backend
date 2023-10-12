@@ -36,37 +36,37 @@ https://singular-jalebi-389fbc.netlify.app/#/users/register
 <h4> All routes below have authentication and authorization required </h4>
 <h5> User add product </h5>
 POST Route <br />
-https://singular-jalebi-389fbc.netlify.app/#/users/add-product/:userId
+`https://singular-jalebi-389fbc.netlify.app/#/users/add-product/:userId`
 
 <h5> User fetching his uploaded products </h5>
 GET Route <br />
-https://singular-jalebi-389fbc.netlify.app/#/users/:productId/products
+`https://singular-jalebi-389fbc.netlify.app/#/users/:productId/products`
 
 <h4> Cart </h4>
 <h5> User fetch cart </h5>
 GET Route <br />
-https://singular-jalebi-389fbc.netlify.app/#/cart
+`https://singular-jalebi-389fbc.netlify.app/#/cart`
 
 <h5> User add item to cart </h5>
 POST Route <br />
-https://singular-jalebi-389fbc.netlify.app/#/cart/:product_id/add
+`https://singular-jalebi-389fbc.netlify.app/#/cart/:product_id/add`
 
 <h5> User update cart item quantity </h5>
 POST Route <br />
-https://singular-jalebi-389fbc.netlify.app/#/cart/update-qty
+`https://singular-jalebi-389fbc.netlify.app/#/cart/update-qty`
 
 <h4> Checkout </h4>
 POST Route <br />
-https://singular-jalebi-389fbc.netlify.app/#/checkout
+`https://singular-jalebi-389fbc.netlify.app/#/checkout`
 
 <h5> Stripe Webhook route </h5>
 This route allows our site to receive confirmation of user payment<br />
 POST Route <br />
-https://singular-jalebi-389fbc.netlify.app/#/checkout/process-payment
+`https://singular-jalebi-389fbc.netlify.app/#/checkout/process-payment`
 
 <h5> User fetch his/her paid orders </h5>
 GET Route <br />
-https://singular-jalebi-389fbc.netlify.app/#/orders
+`https://singular-jalebi-389fbc.netlify.app/#/orders`
 
 <h4> Non-Restful API endpoints showcase for Admin user </h4>
 <h5> Admin Login </h5>
@@ -79,15 +79,15 @@ https://writers-base-backend.onrender.com/admin/products
 
 <h5> Admin update products </h5>
 POST Route <br />
-https://writers-base-backend.onrender.com/admin/products/:productId/update
+`https://writers-base-backend.onrender.com/admin/products/:productId/update`
 
 <h5> Admin deleting a cart </h5>
 POST Route <br />
-https://writers-base-backend.onrender.com/admin/carts/:cartId/delete-cart
+`https://writers-base-backend.onrender.com/admin/carts/:cartId/delete-cart`
 
 <h5> Admin updating an order </h5>
 POST Route <br />
-https://writers-base-backend.onrender.com/admin/orders/update-quantity
+`https://writers-base-backend.onrender.com/admin/orders/update-quantity`
 
 <h4> Testing </h4>
 Testing is conducted on development frontend routes and localhost routes.
