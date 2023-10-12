@@ -36,7 +36,7 @@ https://singular-jalebi-389fbc.netlify.app/#/users/register
 <h2> All routes below have authentication and authorization required </h2>
 <h3> User add product </h3>
 POST Route <br />
-<https://singular-jalebi-389fbc.netlify.app/#/users/add-product/:userId>
+"""https://singular-jalebi-389fbc.netlify.app/#/users/add-product/:userId"""
 
 <h3> User fetching his uploaded products </h3>
 GET Route <br />
