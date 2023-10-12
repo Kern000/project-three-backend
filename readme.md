@@ -56,6 +56,7 @@ POST Route <br />
 https://<span></span>singular-jalebi-389fbc.netlify.app/#/cart/update-qty
 
 <h2> Checkout </h2>
+<h3> Get Checkout widget </h3>
 POST Route <br />
 https://<span></span>singular-jalebi-389fbc.netlify.app/#/checkout
 
